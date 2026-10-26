@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "requestId": "f2416255aa59cb8e6a6a4894",
+  "repository": "UMEDJON12/smartvoice-tj-updates",
+  "publicKeyPem": "-----BEGIN PUBLIC KEY-----\nMIIBojANBgkqhkiG9w0BAQEFAAOCAY8AMIIBigKCAYEAqSU05059Nl9G6zs1P6BL\nVzGPrU+KrtcLDVw6JgdCJT8xp8MCbyH8YsP+DM3mx+9ekBo57plCclkyyVIwsIFp\nEpqmX3LSvmM5Vhi3hs7gB3lnsEIo+1JK5Tr7NDyu8/KlRtEM8DKTkry5T7kFBgGP\nblRMj2Wt6rvmMkqX44p5HYiduX23K/VDZNJT/hc837ONkuRahycjIalhBSneC36H\nS/4yGYVvsAbCDCQidzL9XZQMij8Kuj6FLZY65gSayiIE36JZ5vrvyzolgERVhgII\nLivwg9cxKpwPtlv9ty7QMhVdQKV2VT7LMuNlowK+6+oCkvS87gbsO8e66CrJX2hz\ne4pLYJYfs3eDASyS2kj6SxWiiM5qf8wRhl0VV2+cT2bi70ktx+qir2ckAf9KkW9i\nuHrh0U5Nwyq0yhbVRZohA1GCi40zY+ZUmuUwvy4qsvdx96eTbl1XOwnJoLTHYkM+\nSLYMJPVRNzkvFs0VVMgsNjZXnpnITGDSmvZBKDXPxt0nAgMBAAE=\n-----END PUBLIC KEY-----\n",
+  "publicKeySha256": "d4aa8706dc996e536617155e6de87d325a73ff4733e24c4e6de57048058c0326",
+  "releaseId": 424314799,
+  "filename": "SmartVoice-TJ36.apk",
+  "sha256": "4b20141965905f963f485295654bf8459d6e03e3b308aaa113714a3fb1fc7c34",
+  "sizeBytes": 62224353,
+  "packageName": "tts.smartvoice.umedjon",
+  "versionCode": 4144,
+  "versionName": "5.2.28-TJ",
+  "signingCertificateSha256": "5d1d676dfddad74da47b5486b4dbe9bf66b68e67c7c256d144ec0bdf3f0ed95b",
+  "testOnly": true
+}
