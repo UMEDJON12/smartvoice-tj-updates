@@ -1,0 +1,283 @@
+name: Secure APK upload to draft
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/secure-apk-upload.yml'
+      - 'checks/start-transfer-*.json'
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: smartvoice-secure-apk-upload
+  cancel-in-progress: false
+jobs:
+  receive:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Receive encrypted APK and verify draft assets
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          python3 - <<'PY'
+          import base64
+          import glob
+          import hashlib
+          import hmac
+          import json
+          import os
+          from pathlib import Path
+          import re
+          import shutil
+          import subprocess
+          import tempfile
+          import time
+          import urllib.error
+          import urllib.parse
+          import urllib.request
+          import zipfile
+          
+          REPO = "UMEDJON12/smartvoice-tj-updates"
+          PACKAGE = "tts.smartvoice.umedjon"
+          CERT = "5d1d676dfddad74da47b5486b4dbe9bf66b68e67c7c256d144ec0bdf3f0ed95b"
+          HEADER_FIELDS = ("sessionId", "filename", "sizeBytes", "sha256", "packageName", "versionCode", "versionName")
+          PREFIX = b"SmartVoice release transfer v1\0"
+          API = "https://api.github.com"
+          MAX_SIZE = 128 * 1024 * 1024
+          
+          
+          def canonical_header(manifest):
+              return json.dumps({k: manifest[k] for k in HEADER_FIELDS}, sort_keys=True, separators=(",", ":"), ensure_ascii=True).encode()
+          
+          
+          class SafeRedirect(urllib.request.HTTPRedirectHandler):
+              def redirect_request(self, req, fp, code, msg, headers, newurl):
+                  parsed = urllib.parse.urlsplit(newurl)
+                  host = parsed.hostname or ""
+                  if parsed.scheme != "https" or not (host == "github.com" or host == "api.github.com" or host.endswith(".githubusercontent.com")):
+                      raise RuntimeError("Unexpected download redirect host")
+                  nxt = super().redirect_request(req, fp, code, msg, headers, newurl)
+                  if host != urllib.parse.urlsplit(req.full_url).hostname:
+                      nxt.remove_header("Authorization")
+                  return nxt
+          
+          
+          def main():
+              os.umask(0o077)
+              assert os.environ["GITHUB_REPOSITORY"] == REPO
+              token = os.environ["GH_TOKEN"]
+              session = os.environ["GITHUB_RUN_ID"] + "-" + os.environ["GITHUB_RUN_ATTEMPT"]
+          
+              def api(path, method="GET", data=None):
+                  url = API + path if path.startswith("/") else path
+                  parsed = urllib.parse.urlsplit(url)
+                  assert parsed.scheme == "https" and parsed.hostname in ("api.github.com", "uploads.github.com")
+                  if parsed.hostname == "uploads.github.com":
+                      assert parsed.path.startswith("/repos/" + REPO + "/releases/")
+                  raw = json.dumps(data).encode() if isinstance(data, (dict, list)) else data
+                  req = urllib.request.Request(url, data=raw, method=method, headers={
+                      "Authorization": "Bearer " + token,
+                      "Accept": "application/vnd.github+json",
+                      "X-GitHub-Api-Version": "2026-03-10",
+                      "Content-Type": "application/json" if isinstance(data, (dict, list)) else "application/octet-stream",
+                  })
+                  with urllib.request.urlopen(req, timeout=90) as response:
+                      return json.load(response)
+          
+              def get_file(path):
+                  try:
+                      obj = api("/repos/" + REPO + "/contents/" + path + "?ref=main")
+                  except urllib.error.HTTPError as exc:
+                      if exc.code == 404:
+                          return None, None
+                      raise
+                  assert obj["encoding"] == "base64"
+                  return json.loads(base64.b64decode(obj["content"])), obj["sha"]
+          
+              def put_file(path, data, message):
+                  _, sha = get_file(path)
+                  body = {"message": message, "content": base64.b64encode((json.dumps(data, ensure_ascii=False, indent=2) + "\n").encode()).decode(), "branch": "main"}
+                  if sha:
+                      body["sha"] = sha
+                  return api("/repos/" + REPO + "/contents/" + path, "PUT", body)
+          
+              def command(args):
+                  result = subprocess.run(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                  if result.returncode:
+                      raise RuntimeError("Required verification or cryptographic command failed")
+                  return result.stdout.decode("utf-8", "replace")
+          
+              def sdk_tool(name):
+                  for root in (os.environ.get("ANDROID_HOME"), os.environ.get("ANDROID_SDK_ROOT"), "/usr/local/lib/android/sdk"):
+                      if root:
+                          matches = sorted(glob.glob(root + "/build-tools/*/" + name), reverse=True)
+                          if matches:
+                              return matches[0]
+                  raise RuntimeError("Android SDK tool is unavailable: " + name)
+          
+              with tempfile.TemporaryDirectory(prefix="smartvoice-transfer-") as temporary:
+                  work = Path(temporary)
+                  private = work / "receiver-private.pem"
+                  public = work / "receiver-public.pem"
+                  command(["openssl", "genpkey", "-algorithm", "RSA", "-pkeyopt", "rsa_keygen_bits:3072", "-out", str(private)])
+                  command(["openssl", "pkey", "-in", str(private), "-pubout", "-out", str(public)])
+                  put_file("checks/receiver-session.json", {
+                      "schemaVersion": 1, "sessionId": session,
+                      "publicKeyPem": public.read_text(),
+                      "algorithm": "RSA-OAEP-SHA256/AES-256-CBC/HMAC-SHA256",
+                      "expiresAfterSeconds": 1500,
+                  }, "Open temporary encrypted APK transfer session")
+                  print("Encrypted transfer receiver ready: " + session, flush=True)
+                  deadline = time.monotonic() + 1500
+                  manifest = None
+                  while time.monotonic() < deadline:
+                      obj, _ = get_file("checks/transfer.json")
+                      if obj and obj.get("sessionId") == session:
+                          manifest = obj
+                          break
+                      time.sleep(5)
+                  if manifest is None:
+                      raise RuntimeError("Transfer session expired without a matching manifest")
+                  assert manifest["schemaVersion"] == 1
+                  assert manifest["packageName"] == PACKAGE
+                  assert re.fullmatch(r"SmartVoice[-A-Za-z0-9_.]+\.apk", manifest["filename"])
+                  assert 0 < manifest["sizeBytes"] < MAX_SIZE
+                  assert re.fullmatch(r"[a-f0-9]{64}", manifest["sha256"])
+                  assert isinstance(manifest["versionCode"], int) and manifest["versionCode"] > 0
+                  assert 1 <= len(manifest["chunks"]) <= 256
+                  assert manifest["cipherSizeBytes"] <= MAX_SIZE
+                  iv = base64.b64decode(manifest["iv"], validate=True)
+                  assert len(iv) == 16
+                  wrapped = base64.b64decode(manifest["wrappedKeys"], validate=True)
+                  assert len(wrapped) == 384
+                  (work / "wrapped.bin").write_bytes(wrapped)
+                  command(["openssl", "pkeyutl", "-decrypt", "-inkey", str(private), "-in", str(work / "wrapped.bin"), "-out", str(work / "keys.bin"), "-pkeyopt", "rsa_padding_mode:oaep", "-pkeyopt", "rsa_oaep_md:sha256", "-pkeyopt", "rsa_mgf1_md:sha256"])
+                  keys = (work / "keys.bin").read_bytes()
+                  assert len(keys) == 64
+                  authenticator = hmac.new(keys[32:], PREFIX + canonical_header(manifest) + iv, hashlib.sha256)
+                  cipher_hash = hashlib.sha256()
+                  total = 0
+                  ciphertext = work / "payload.enc"
+                  with ciphertext.open("wb") as output:
+                      for chunk in manifest["chunks"]:
+                          assert re.fullmatch(r"[a-f0-9]{40}", chunk["blobSha"])
+                          assert re.fullmatch(r"\.transfer/" + re.escape(session) + r"/part-[0-9]{3}\.bin", chunk["path"])
+                          assert 0 < chunk["sizeBytes"] <= 1024 * 1024
+                          obj = api("/repos/" + REPO + "/git/blobs/" + chunk["blobSha"])
+                          assert obj["encoding"] == "base64"
+                          raw = base64.b64decode(obj["content"])
+                          assert len(raw) == obj["size"] == chunk["sizeBytes"]
+                          assert hashlib.sha256(raw).hexdigest() == chunk["sha256"]
+                          total += len(raw)
+                          assert total <= manifest["cipherSizeBytes"]
+                          output.write(raw)
+                          authenticator.update(raw)
+                          cipher_hash.update(raw)
+                  assert total == manifest["cipherSizeBytes"]
+                  assert cipher_hash.hexdigest() == manifest["cipherSha256"]
+                  assert hmac.compare_digest(authenticator.hexdigest(), manifest["hmacSha256"])
+                  apk = work / manifest["filename"]
+                  command(["openssl", "enc", "-d", "-aes-256-cbc", "-K", keys[:32].hex(), "-iv", iv.hex(), "-in", str(ciphertext), "-out", str(apk)])
+                  assert apk.stat().st_size == manifest["sizeBytes"]
+                  assert hashlib.sha256(apk.read_bytes()).hexdigest() == manifest["sha256"]
+                  with zipfile.ZipFile(apk) as archive:
+                      assert archive.testzip() is None
+                  signature = command([sdk_tool("apksigner"), "verify", "--print-certs", str(apk)])
+                  certificates = re.findall(r"certificate SHA-256 digest: ([a-fA-F0-9]+)", signature)
+                  assert len(certificates) == 1 and certificates[0].lower() == CERT
+                  badging = command([sdk_tool("aapt"), "dump", "badging", str(apk)])
+                  match = re.search(r"package: name='([^']+)' versionCode='([0-9]+)' versionName='([^']+)'", badging)
+                  assert match and match.group(1) == PACKAGE
+                  assert int(match.group(2)) == manifest["versionCode"] and match.group(3) == manifest["versionName"]
+                  minimum = re.search(r"sdkVersion:'([0-9]+)'", badging)
+                  assert minimum
+                  print("APK hash, ZIP, Android signature, package and version verified", flush=True)
+          
+                  release_id = manifest["releaseId"]
+                  assert isinstance(release_id, int) and release_id > 0
+                  release = api("/repos/" + REPO + "/releases/" + str(release_id))
+                  assert release["draft"] is True
+                  assert release["tag_name"].startswith("upload-check-")
+                  upload_url = release["upload_url"].split("{", 1)[0]
+                  assert upload_url.startswith("https://uploads.github.com/repos/" + REPO + "/releases/")
+          
+                  def upload(name, data):
+                      digest = "sha256:" + hashlib.sha256(data).hexdigest()
+                      existing = next((x for x in release["assets"] if x["name"] == name), None)
+                      if existing:
+                          assert existing["size"] == len(data) and existing["digest"] == digest
+                          return existing
+                      obj = api(upload_url + "?name=" + urllib.parse.quote(name), "POST", data)
+                      assert obj["size"] == len(data) and obj["digest"] == digest and obj["state"] == "uploaded"
+                      return obj
+          
+                  apk_asset = upload(manifest["filename"], apk.read_bytes())
+                  update = {
+                      "schemaVersion": 1, "testOnly": True, "variant": "standard",
+                      "packageName": PACKAGE, "versionCode": manifest["versionCode"], "versionName": manifest["versionName"],
+                      "apkFileName": manifest["filename"], "apkUrl": apk_asset["browser_download_url"],
+                      "sizeBytes": manifest["sizeBytes"], "sha256": manifest["sha256"], "signingCertificateSha256": CERT,
+                      "minSdk": int(minimum.group(1)),
+                      "releaseNotes": "Проверка загрузки уже выпущенной обычной версии SmartVoice. Новая версия приложения не создавалась.",
+                  }
+                  update_bytes = (json.dumps(update, ensure_ascii=False, indent=2) + "\n").encode()
+                  json_asset = upload("update.json", update_bytes)
+          
+                  def download_and_check(asset, expected_sha, expected_size):
+                      req = urllib.request.Request(API + "/repos/" + REPO + "/releases/assets/" + str(asset["id"]), headers={
+                          "Authorization": "Bearer " + token, "Accept": "application/octet-stream", "X-GitHub-Api-Version": "2026-03-10",
+                      })
+                      size, digest = 0, hashlib.sha256()
+                      with urllib.request.build_opener(SafeRedirect()).open(req, timeout=120) as response:
+                          while True:
+                              block = response.read(1024 * 1024)
+                              if not block:
+                                  break
+                              size += len(block)
+                              assert size <= expected_size
+                              digest.update(block)
+                      assert size == expected_size and digest.hexdigest() == expected_sha
+          
+                  download_and_check(apk_asset, manifest["sha256"], manifest["sizeBytes"])
+                  download_and_check(json_asset, hashlib.sha256(update_bytes).hexdigest(), len(update_bytes))
+                  release = api("/repos/" + REPO + "/releases/" + str(release_id), "PATCH", {
+                      "name": "SmartVoice " + manifest["versionName"] + " — проверка загрузки",
+                      "body": "Тест загрузки последнего готового APK и update.json. Файлы скачаны обратно, SHA-256 и подпись APK проверены. Это черновик для владельца; не публиковать как новое обновление.",
+                      "draft": True, "prerelease": True, "make_latest": "false",
+                  })
+                  assert release["draft"] is True
+                  try:
+                      with urllib.request.urlopen(API + "/repos/" + REPO + "/releases/" + str(release_id), timeout=30):
+                          raise RuntimeError("Draft unexpectedly visible without authentication")
+                  except urllib.error.HTTPError as exc:
+                      assert exc.code == 404
+                  print("Both release assets downloaded and verified; draft hidden from anonymous users", flush=True)
+          
+                  # Remove only this transfer's encrypted files and session control files.
+                  ref = api("/repos/" + REPO + "/git/ref/heads/main")
+                  parent = ref["object"]["sha"]
+                  commit = api("/repos/" + REPO + "/git/commits/" + parent)
+                  paths = [x["path"] for x in manifest["chunks"]] + ["checks/transfer.json", "checks/receiver-session.json"]
+                  tree = api("/repos/" + REPO + "/git/trees", "POST", {"base_tree": commit["tree"]["sha"], "tree": [{"path": p, "mode": "100644", "type": "blob", "sha": None} for p in paths]})
+                  cleanup = api("/repos/" + REPO + "/git/commits", "POST", {"message": "Remove completed encrypted APK transfer files", "tree": tree["sha"], "parents": [parent]})
+                  api("/repos/" + REPO + "/git/refs/heads/main", "PATCH", {"sha": cleanup["sha"], "force": False})
+                  result = {
+                      "schemaVersion": 1, "sessionId": session, "status": "success", "testOnly": True, "published": False,
+                      "releaseId": release_id, "draftUrl": release["html_url"], "apkAssetId": apk_asset["id"], "updateAssetId": json_asset["id"],
+                      "filename": manifest["filename"], "packageName": PACKAGE, "versionCode": manifest["versionCode"], "versionName": manifest["versionName"],
+                      "sizeBytes": manifest["sizeBytes"], "sha256": manifest["sha256"], "signingCertificateSha256": CERT,
+                      "apkDownloadedAndVerified": True, "jsonDownloadedAndVerified": True, "signatureVerified": True,
+                      "anonymousDraftAccessDenied": True, "temporaryFilesRemoved": True,
+                  }
+                  put_file("checks/last-transfer-result.json", result, "Record successful end-to-end draft APK upload check")
+                  with open(os.environ["GITHUB_STEP_SUMMARY"], "a", encoding="utf-8") as output:
+                      output.write("APK and update.json uploaded and downloaded; SHA-256, original APK certificate, package and version verified. Draft remains unpublished. Temporary transfer files removed.\n")
+                      output.write(release["html_url"] + "\n")
+                  print(json.dumps(result, ensure_ascii=False), flush=True)
+          
+          
+          if __name__ == "__main__":
+              main()
+          
+          PY
