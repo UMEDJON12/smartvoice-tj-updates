@@ -10,11 +10,11 @@ permissions:
   contents: write
 concurrency:
   group: smartvoice-secure-apk-upload
-  cancel-in-progress: false
+  cancel-in-progress: true
 jobs:
   receive:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 65
     steps:
       - name: Receive encrypted APK and verify draft assets
         env:
@@ -126,10 +126,10 @@ jobs:
                       "schemaVersion": 1, "sessionId": session,
                       "publicKeyPem": public.read_text(),
                       "algorithm": "RSA-OAEP-SHA256/AES-256-CBC/HMAC-SHA256",
-                      "expiresAfterSeconds": 1500,
+                      "expiresAfterSeconds": 3600,
                   }, "Open temporary encrypted APK transfer session")
                   print("Encrypted transfer receiver ready: " + session, flush=True)
-                  deadline = time.monotonic() + 1500
+                  deadline = time.monotonic() + 3600
                   manifest = None
                   while time.monotonic() < deadline:
                       obj, _ = get_file("checks/transfer.json")
