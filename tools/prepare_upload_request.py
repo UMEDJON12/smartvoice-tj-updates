@@ -19,10 +19,13 @@ def main():
     parser.add_argument("--apk", type=Path, required=True)
     parser.add_argument("--version-name", required=True)
     parser.add_argument("--version-code", type=int, required=True)
-    parser.add_argument("--release-id", type=int, required=True)
+    parser.add_argument("--release-id", type=int, default=0)
+    parser.add_argument("--production", action="store_true")
+    parser.add_argument("--tag-name", default="")
+    parser.add_argument("--notes-file", type=Path)
     args = parser.parse_args()
     assert args.apk.is_file() and re.fullmatch(r"SmartVoice[-A-Za-z0-9_.]+\.apk", args.apk.name)
-    assert args.version_code > 0 and args.release_id > 0
+    assert args.version_code > 0 and (args.release_id > 0 or re.fullmatch(r"v[0-9]+\.[0-9]+\.[0-9]+-TJ", args.tag_name))
     os.umask(0o077)
     root = Path(__file__).resolve().parent.parent
     private = root / ".release-upload-private" / "direct"
@@ -42,7 +45,8 @@ def main():
         "releaseId": args.release_id, "filename": target.name, "sizeBytes": target.stat().st_size,
         "sha256": hashlib.sha256(target.read_bytes()).hexdigest(), "packageName": PACKAGE,
         "versionCode": args.version_code, "versionName": args.version_name,
-        "signingCertificateSha256": CERT, "testOnly": True}
+        "signingCertificateSha256": CERT, "testOnly": not args.production, "tagName": args.tag_name,
+        "releaseNotes": args.notes_file.read_text() if args.notes_file else ""}
     serialized = json.dumps(request, ensure_ascii=False, indent=2) + "\n"
     (private / "request.json").write_text(serialized)
     checks = root / "checks"
