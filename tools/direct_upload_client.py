@@ -103,6 +103,7 @@ def main():
     update_asset = upload("update.json", update_bytes, "application/json")
     release = api("/releases/" + str(release["id"]), "PATCH", {
         "name": "SmartVoice " + request["versionName"],
+        "tag_name": request.get("tagName") or release["tag_name"],
         "body": request.get("releaseNotes", ""),
         "draft": True, "prerelease": request["testOnly"]})
     assert release["draft"] is True
