@@ -82,8 +82,10 @@ def main():
         assert current["draft"] is True
         existing = next((x for x in current["assets"] if x["name"] == name), None)
         if existing:
-            assert existing["size"] == len(data) and existing["digest"] == digest
-            return existing
+            if existing["size"] == len(data) and existing["digest"] == digest:
+                return existing
+            assert name == "update.json", "Never overwrite a different APK"
+            api("/releases/assets/" + str(existing["id"]), "DELETE")
         obj = api(upload_url + "?name=" + urllib.parse.quote(name), "POST", data, content_type)
         assert obj["state"] == "uploaded" and obj["size"] == len(data) and obj["digest"] == digest
         return obj
@@ -93,7 +95,7 @@ def main():
     print("APK uploaded; server SHA-256 matches", flush=True)
     update = {"schemaVersion": 1, "testOnly": request["testOnly"], "variant": "standard", "packageName": request["packageName"],
         "versionCode": request["versionCode"], "versionName": request["versionName"], "apkFileName": request["filename"],
-        "apkUrl": apk_asset["browser_download_url"], "sizeBytes": request["sizeBytes"], "sha256": request["sha256"],
+        "apkUrl": ("https://github.com/" + REPO + "/releases/download/" + urllib.parse.quote(request["tagName"], safe="") + "/" + urllib.parse.quote(request["filename"])) if request.get("tagName") else apk_asset["browser_download_url"], "sizeBytes": request["sizeBytes"], "sha256": request["sha256"],
         "signingCertificateSha256": request["signingCertificateSha256"], "minSdk": 21,
         "releaseNotes": request.get("releaseNotes", "")}
     update_bytes = (json.dumps(update, ensure_ascii=False, indent=2) + "\n").encode()
@@ -102,7 +104,7 @@ def main():
     release = api("/releases/" + str(release["id"]), "PATCH", {
         "name": "SmartVoice " + request["versionName"],
         "body": request.get("releaseNotes", ""),
-        "draft": True, "prerelease": request["testOnly"], "make_latest": "false"})
+        "draft": True, "prerelease": request["testOnly"]})
     assert release["draft"] is True
     client_result = {"schemaVersion": 1, "requestId": request["requestId"], "status": "uploaded",
         "releaseId": release["id"], "apkAssetId": apk_asset["id"], "updateAssetId": update_asset["id"],
