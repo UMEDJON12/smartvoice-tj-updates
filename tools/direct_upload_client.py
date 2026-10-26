@@ -3,6 +3,8 @@ import hashlib
 import hmac
 import json
 import os
+import sys
+import urllib.error
 from pathlib import Path
 import subprocess
 import urllib.parse
@@ -55,6 +57,16 @@ def main():
             body = response.read()
             return json.loads(body) if body else None
 
+    if "--verify-revoked" in sys.argv:
+        try:
+            api("/releases/" + str(session["releaseId"]))
+        except urllib.error.HTTPError as exc:
+            if exc.code == 401:
+                print("Temporary GitHub upload credential revoked: HTTP 401")
+                return
+            raise
+        raise RuntimeError("Temporary credential is still active")
+
     apk = ROOT / "release-upload-work" / "input" / request["filename"]
     assert apk.stat().st_size == request["sizeBytes"]
     assert hashlib.sha256(apk.read_bytes()).hexdigest() == request["sha256"]
@@ -79,17 +91,18 @@ def main():
     print("Uploading APK directly to draft", flush=True)
     apk_asset = upload(request["filename"], apk.read_bytes(), "application/vnd.android.package-archive")
     print("APK uploaded; server SHA-256 matches", flush=True)
-    update = {"schemaVersion": 1, "testOnly": True, "variant": "standard", "packageName": request["packageName"],
+    update = {"schemaVersion": 1, "testOnly": request["testOnly"], "variant": "standard", "packageName": request["packageName"],
         "versionCode": request["versionCode"], "versionName": request["versionName"], "apkFileName": request["filename"],
         "apkUrl": apk_asset["browser_download_url"], "sizeBytes": request["sizeBytes"], "sha256": request["sha256"],
         "signingCertificateSha256": request["signingCertificateSha256"], "minSdk": 21,
-        "releaseNotes": "Проверка загрузки уже выпущенной обычной версии SmartVoice. Новая версия приложения не создавалась."}
+        "releaseNotes": request.get("releaseNotes", "")}
     update_bytes = (json.dumps(update, ensure_ascii=False, indent=2) + "\n").encode()
+    (PRIVATE / "update.json").write_bytes(update_bytes)
     update_asset = upload("update.json", update_bytes, "application/json")
     release = api("/releases/" + str(release["id"]), "PATCH", {
-        "name": "SmartVoice " + request["versionName"] + " — проверка загрузки",
-        "body": "Проверка загрузки последнего готового APK и update.json. Черновик для владельца. Не публиковать как новое обновление.",
-        "draft": True, "prerelease": True, "make_latest": "false"})
+        "name": "SmartVoice " + request["versionName"],
+        "body": request.get("releaseNotes", ""),
+        "draft": True, "prerelease": request["testOnly"], "make_latest": "false"})
     assert release["draft"] is True
     client_result = {"schemaVersion": 1, "requestId": request["requestId"], "status": "uploaded",
         "releaseId": release["id"], "apkAssetId": apk_asset["id"], "updateAssetId": update_asset["id"],
