@@ -1,11 +1,11 @@
 {
   "schemaVersion": 1,
-  "requestId": "f2416255aa59cb8e6a6a4894",
+  "requestId": "84039be849adda482211de4f",
   "status": "uploaded",
-  "releaseId": 424314799,
-  "apkAssetId": 678753226,
-  "updateAssetId": 678754231,
-  "apkSha256": "4b20141965905f963f485295654bf8459d6e03e3b308aaa113714a3fb1fc7c34",
-  "updateSha256": "58f3524ec55af5bf63b6ddb3bb66150e1149de0ffb2e690003ef91a73c10d10c",
+  "releaseId": 424587476,
+  "apkAssetId": 679004008,
+  "updateAssetId": 679004558,
+  "apkSha256": "3f5f39b53d3c3098c624d228758a55c63cc73fc44a2c9d456ecbaad8d60ca967",
+  "updateSha256": "d4d991f6e1a7673bb3425ba2de5510ce094b1b65ed35ecee9d47b3b8e0abd9e1",
   "published": false
 }
