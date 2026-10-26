@@ -1,9 +1,9 @@
 {
   "schemaVersion": 1,
-  "requestId": "bbe0924ddb706406641c6df0",
+  "requestId": "5dbae1fd47cbf35f16336f8d",
   "repository": "UMEDJON12/smartvoice-tj-updates",
-  "publicKeyPem": "-----BEGIN PUBLIC KEY-----\nMIIBojANBgkqhkiG9w0BAQEFAAOCAY8AMIIBigKCAYEAhnxDUWv0LaSor+xmDgkp\n6Hfe7ebnnLEoFEizT1bAaBQaEvD1sbqxw4OkAnRbgUgusjUswsWEvn6Ds1W5/Z4y\ntUA/gYmQzR3ciSwDslvUm8JIYgHEpmaBUMrt9Kj/1BywjPaTGEylIMgyKcMDC6fO\naoqt3oB6uwPj81MdyQIim0sdtQxMT7GYwn2mjJWkWrxmj3OHIKt+fD87WVAda3nh\nCQrZJmo36JZg7tVx3PH0SIgtRbZriSYhAvXGL6kzPQj7EWmJSCVuTUXimE5MGLmI\nQQImJbUbjYXJwxQvCMyplM96rkSDWib3gq/4xe5xIG0y2x2Fa6zWxS2u+P1H3AjI\nf9n4macYIC7tPMUzeokyKwH6BxbXlUfgbeRbfCUAg/FHwoKZ3hR5yz0F5RfkFEMw\nkwqjQH20aBKKqC1ZYV5U3q2XQnJSrNZpW80R4XFCO2JjqDzPDXirHuJleKamAH1f\nT1aUENVCkodH3slV3e7snRRj+J/TBOjZ1jCGv979ATrdAgMBAAE=\n-----END PUBLIC KEY-----\n",
-  "publicKeySha256": "47dca173c457067253c61ff2102656026e725f5d487e106c111976e853c2e984",
+  "publicKeyPem": "-----BEGIN PUBLIC KEY-----\nMIIBojANBgkqhkiG9w0BAQEFAAOCAY8AMIIBigKCAYEAlrJxXhd/S3aTP5gHDgGh\nsB3kaIptyi3QBOO8TeGGdfIQIy8x6bZFm9WrtiQ+64X2aRqwR1UzMTaloYGcwlKO\nrCWDWt1QaiPpMqwDzMJL6QrkYX126OAwfpv5A92wbi5Fc0IgLNN9PAiO6RqH2ble\ns0bP9uwyr6rjKfRPAnAekZZlUMCl3W/hi++BBHRDP3l69/zJkdQmbnigztONXfSK\nu2jpIekK7rzlum5sLqC4glWmKw73B49I1VAyk+bcLdWipZ20cOUpvEFong7i1GQo\nITbaJdAK6sc/QGC5GZq5/TpBjO9JOx0QbsjD38z2jukN6s8jlQtvju2rQCY3tAWQ\nC3cG+qUopEWX1sW1yWBpUHkoo0HgtT/IPq/BwO7mN7vZAnzGYoR64LKRsYmX9oRi\nJ3CyklX7H4UolpsAXaEqDDiodSK4N3iRzOZfwh6jYM3DnONhHsR+1l4bXv3GRFhF\nsA2GWoCGGbbuVO+TI+l4bfVp+hjnyiY/zgNswYw+yDLJAgMBAAE=\n-----END PUBLIC KEY-----\n",
+  "publicKeySha256": "df8c618112af077ca14d2fb088abf19bb2dc258aeeb67e22708dcb700acf63f3",
   "releaseId": 424587476,
   "filename": "SmartVoice-TJ37.apk",
   "sizeBytes": 61985210,
