@@ -1,0 +1,9 @@
+.release-upload-private/
+.release-upload-helpers/
+release-upload-work/
+*.apk
+*.pem
+*.p12
+*.jks
+*.keystore
+__pycache__/
