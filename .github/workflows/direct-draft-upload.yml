@@ -24,6 +24,7 @@ jobs:
           import base64
           import glob
           import hashlib
+          import hmac
           import json
           import os
           from pathlib import Path
@@ -112,11 +113,16 @@ jobs:
                   work = Path(temporary)
                   public = work / "client-public.pem"
                   public.write_text(request["publicKeyPem"])
-                  encrypted = command(["openssl", "pkeyutl", "-encrypt", "-pubin", "-inkey", str(public),
-                      "-pkeyopt", "rsa_padding_mode:oaep", "-pkeyopt", "rsa_oaep_md:sha256", "-pkeyopt", "rsa_mgf1_md:sha256"], token.encode())
+                  keys, iv = os.urandom(64), os.urandom(16)
+                  encrypted = command(["openssl", "enc", "-aes-256-cbc", "-K", keys[:32].hex(), "-iv", iv.hex()], token.encode())
+                  wrapped = command(["openssl", "pkeyutl", "-encrypt", "-pubin", "-inkey", str(public),
+                      "-pkeyopt", "rsa_padding_mode:oaep", "-pkeyopt", "rsa_oaep_md:sha256", "-pkeyopt", "rsa_mgf1_md:sha256"], keys)
+                  context = b"SmartVoice scoped upload token v1\0" + request["requestId"].encode() + b"\0" + REPO.encode() + b"\0"
+                  mac = hmac.new(keys[32:], context + iv + encrypted, hashlib.sha256).hexdigest()
                   session = {"schemaVersion": 1, "requestId": request["requestId"], "repository": REPO,
                       "publicKeySha256": request["publicKeySha256"], "runId": run_id,
                       "encryptedToken": base64.b64encode(encrypted).decode(), "validForSeconds": 900,
+                      "wrappedKeys": base64.b64encode(wrapped).decode(), "iv": base64.b64encode(iv).decode(), "hmacSha256": mac,
                       "permissions": ["contents:write"], "releaseId": release["id"]}
                   put_file("checks/upload-session.json", session, "Open encrypted short-lived draft upload session")
                   print("Scoped encrypted session ready; no plaintext credential is logged", flush=True)
