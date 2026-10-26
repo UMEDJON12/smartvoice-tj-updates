@@ -117,7 +117,7 @@ jobs:
                   release = matches[0] if matches else api("/releases", "POST", {"tag_name": tag,
                       "target_commitish": "main", "name": "SmartVoice " + request["versionName"],
                       "body": request.get("releaseNotes", ""), "draft": True,
-                      "prerelease": request["testOnly"], "make_latest": "false"})
+                      "prerelease": request["testOnly"]})
               assert release["draft"] is True
               with tempfile.TemporaryDirectory(prefix="smartvoice-direct-check-") as temporary:
                   work = Path(temporary)
@@ -182,7 +182,10 @@ jobs:
                           assert update[field] == request[field]
                       assert update["testOnly"] is request["testOnly"]
                       assert update["variant"] == "standard"
-                      assert update["apkUrl"] == apk_asset["browser_download_url"]
+                      expected_url = ("https://github.com/" + REPO + "/releases/download/" + urllib.parse.quote(request["tagName"], safe="") + "/" + urllib.parse.quote(request["filename"])) if request.get("tagName") else apk_asset["browser_download_url"]
+                      if request.get("tagName"):
+                          assert release["tag_name"] == request["tagName"]
+                      assert update["apkUrl"] == expected_url
                       signature = command([sdk_tool("apksigner"), "verify", "--print-certs", str(apk)]).decode()
                       certificates = re.findall(r"certificate SHA-256 digest: ([a-fA-F0-9]+)", signature)
                       assert len(certificates) == 1 and certificates[0].lower() == CERT
