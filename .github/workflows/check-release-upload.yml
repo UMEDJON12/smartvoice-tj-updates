@@ -1,0 +1,88 @@
+name: Check draft release upload
+on:
+  push:
+    branches: [main]
+    paths: [".github/workflows/check-release-upload.yml"]
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: smartvoice-release-capability-check
+  cancel-in-progress: false
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Create draft and upload test JSON
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          python3 - <<'PY'
+          import hashlib
+          import json
+          import os
+          import urllib.parse
+          import urllib.request
+          
+          repo = os.environ["GITHUB_REPOSITORY"]
+          assert repo == "UMEDJON12/smartvoice-tj-updates"
+          token = os.environ["GH_TOKEN"]
+          api = "https://api.github.com"
+          
+          def request(url, method="GET", data=None, content_type="application/json"):
+              headers = {
+                  "Authorization": "Bearer " + token,
+                  "Accept": "application/vnd.github+json",
+                  "X-GitHub-Api-Version": "2026-03-10",
+                  "Content-Type": content_type,
+              }
+              req = urllib.request.Request(url, data=data, headers=headers, method=method)
+              with urllib.request.urlopen(req, timeout=60) as response:
+                  return json.load(response)
+          
+          tag = "upload-check-" + os.environ["GITHUB_RUN_ID"] + "-" + os.environ["GITHUB_RUN_ATTEMPT"]
+          release = request(api + "/repos/" + repo + "/releases", "POST",
+              json.dumps({
+                  "tag_name": tag,
+                  "target_commitish": os.environ["GITHUB_SHA"],
+                  "name": "TEST: upload check only",
+                  "body": "Capability test. No app update is published. APK has not been uploaded.",
+                  "draft": True,
+                  "prerelease": True,
+                  "make_latest": "false",
+              }).encode("utf-8"))
+          assert release["draft"] is True
+          content = (json.dumps({
+              "schemaVersion": 1,
+              "testOnly": True,
+              "updateAvailable": False,
+              "apkUploaded": False,
+              "packageName": "tts.smartvoice.umedjon",
+          }, ensure_ascii=False, indent=2) + "\n").encode("utf-8")
+          upload_url = release["upload_url"].split("{", 1)[0]
+          expected_prefix = "https://uploads.github.com/repos/" + repo + "/releases/"
+          assert upload_url.startswith(expected_prefix)
+          asset = request(upload_url + "?name=update-test.json", "POST", content)
+          assert asset["name"] == "update-test.json"
+          assert asset["state"] == "uploaded"
+          assert asset["size"] == len(content)
+          expected_digest = "sha256:" + hashlib.sha256(content).hexdigest()
+          assert asset["digest"] == expected_digest
+          check = request(api + "/repos/" + repo + "/releases/" + str(release["id"]))
+          assert check["draft"] is True
+          assert any(x["id"] == asset["id"] for x in check["assets"])
+          print(json.dumps({
+              "draft_created": True,
+              "json_uploaded": True,
+              "digest_verified": True,
+              "apk_uploaded": False,
+              "published": False,
+              "release_id": release["id"],
+              "draft_url": release["html_url"],
+          }))
+          with open(os.environ["GITHUB_STEP_SUMMARY"], "a", encoding="utf-8") as output:
+              output.write("Draft and test JSON created; server SHA-256 verified. APK upload remains untested.\n")
+              output.write(release["html_url"] + "\n")
+          
+          PY
