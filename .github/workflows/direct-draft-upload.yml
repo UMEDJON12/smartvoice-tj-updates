@@ -106,7 +106,18 @@ jobs:
               assert re.fullmatch(r"SmartVoice[-A-Za-z0-9_.]+\.apk", request["filename"])
               assert re.fullmatch(r"[a-f0-9]{64}", request["sha256"])
               assert hashlib.sha256(request["publicKeyPem"].encode()).hexdigest() == request["publicKeySha256"]
-              release = api("/releases/" + str(int(request["releaseId"])))
+              assert isinstance(request["testOnly"], bool)
+              if request.get("releaseId"):
+                  release = api("/releases/" + str(int(request["releaseId"])))
+              else:
+                  tag = request["tagName"]
+                  assert re.fullmatch(r"v[0-9]+\.[0-9]+\.[0-9]+-TJ", tag)
+                  matches = [item for item in api("/releases?per_page=100") if item["tag_name"] == tag]
+                  assert len(matches) <= 1
+                  release = matches[0] if matches else api("/releases", "POST", {"tag_name": tag,
+                      "target_commitish": "main", "name": "SmartVoice " + request["versionName"],
+                      "body": request.get("releaseNotes", ""), "draft": True,
+                      "prerelease": request["testOnly"], "make_latest": "false"})
               assert release["draft"] is True
               with tempfile.TemporaryDirectory(prefix="smartvoice-direct-check-") as temporary:
                   work = Path(temporary)
@@ -169,7 +180,8 @@ jobs:
                       update = json.loads(update_file.read_text())
                       for field in ("packageName", "versionCode", "versionName", "sizeBytes", "sha256", "signingCertificateSha256"):
                           assert update[field] == request[field]
-                      assert update["testOnly"] is True
+                      assert update["testOnly"] is request["testOnly"]
+                      assert update["variant"] == "standard"
                       assert update["apkUrl"] == apk_asset["browser_download_url"]
                       signature = command([sdk_tool("apksigner"), "verify", "--print-certs", str(apk)]).decode()
                       certificates = re.findall(r"certificate SHA-256 digest: ([a-fA-F0-9]+)", signature)
@@ -187,7 +199,7 @@ jobs:
                           anonymous_status = exc.code
                       assert anonymous_status != 200
                       result = {"schemaVersion": 1, "requestId": request["requestId"], "runId": run_id,
-                          "status": "success", "testOnly": True, "published": False, "releaseId": release["id"],
+                          "status": "success", "testOnly": request["testOnly"], "published": False, "releaseId": release["id"],
                           "draftUrl": release["html_url"], "filename": request["filename"], "sizeBytes": request["sizeBytes"],
                           "sha256": request["sha256"], "versionCode": request["versionCode"], "versionName": request["versionName"],
                           "packageName": PACKAGE, "signingCertificateSha256": CERT, "apkDownloadedAndVerified": True,
@@ -205,5 +217,4 @@ jobs:
           
           if __name__ == "__main__":
               main()
-          
           PY
