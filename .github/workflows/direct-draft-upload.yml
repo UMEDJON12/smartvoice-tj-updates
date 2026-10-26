@@ -106,6 +106,16 @@ jobs:
               assert re.fullmatch(r"SmartVoice[-A-Za-z0-9_.]+\.apk", request["filename"])
               assert re.fullmatch(r"[a-f0-9]{64}", request["sha256"])
               assert hashlib.sha256(request["publicKeyPem"].encode()).hexdigest() == request["publicKeySha256"]
+              tag = request.get("tagName")
+              if tag:
+                  assert re.fullmatch(r"v[0-9]+\.[0-9]+\.[0-9]+-TJ", tag)
+                  try:
+                      api("/git/ref/tags/" + urllib.parse.quote(tag, safe=""))
+                  except urllib.error.HTTPError as exc:
+                      if exc.code != 404:
+                          raise
+                      head = api("/git/ref/heads/main")
+                      api("/git/refs", "POST", {"ref": "refs/tags/" + tag, "sha": head["object"]["sha"]})
               assert isinstance(request["testOnly"], bool)
               if request.get("releaseId"):
                   release = api("/releases/" + str(int(request["releaseId"])))
@@ -119,6 +129,8 @@ jobs:
                       "body": request.get("releaseNotes", ""), "draft": True,
                       "prerelease": request["testOnly"]})
               assert release["draft"] is True
+              if tag and release["tag_name"] != tag:
+                  release = api("/releases/" + str(release["id"]), "PATCH", {"tag_name": tag, "draft": True})
               with tempfile.TemporaryDirectory(prefix="smartvoice-direct-check-") as temporary:
                   work = Path(temporary)
                   public = work / "client-public.pem"
