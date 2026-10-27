@@ -1,18 +1,18 @@
 {
   "schemaVersion": 1,
-  "requestId": "2af8c4ad0f0b13853153e524",
+  "requestId": "3de96c4db8cac53893427e18",
   "repository": "UMEDJON12/smartvoice-tj-updates",
-  "publicKeyPem": "-----BEGIN PUBLIC KEY-----\nMIIBojANBgkqhkiG9w0BAQEFAAOCAY8AMIIBigKCAYEAuBggsiUM89G3l+xTqf+j\n1y6HvNEpBz07huSmYqxoQ3j93sqGej69JyE1RfiVDWxedmvYcmH45E3342IH1a0s\nBv1EfKh/Ae4VJQajKHBOPjMdW3Yg2G+4iFiIYWsOioh1VhLYG/KTlYz1I1n9oTu/\nUheT2us30/bzEWA5z3QkT5Znsqk+ibCz9g2fthv2rg+inJwGACynUfwf753gK2OJ\nhfu4EoWW4JbFTf4KqP+PnwEyrzwFh5hdWAOv+NL+qe1V+B/Juvj6SiKHYcbnjkeh\nsNtrEAcRE9m8zWD4CC9SO29uL8wn+mszYlL7+O2avuHCduIb0iiLxmWiWiK4Z4eB\noCV4ks/jpb8csSQxVRNhdOJpEn5mCHlsYEaeO+VdENW6Si0D3zopiAAlD0Z1aGM9\n+dXyBwx1m7uo4n/12Fk9zEUKPG72BEMJwP6CQiHuILyUiUtRedpREXl78aUpnZ54\nkdPTvLpVxszPnBlmAhfyF126xT2TFbrKdzoKeliO9krrAgMBAAE=\n-----END PUBLIC KEY-----\n",
-  "publicKeySha256": "0e86198fed417fd8ad2f903edb615337f909c1b7c18619d95ff04fa9bc4c38c8",
+  "publicKeyPem": "-----BEGIN PUBLIC KEY-----\nMIIBojANBgkqhkiG9w0BAQEFAAOCAY8AMIIBigKCAYEA0mRz12lAkkj299VimmTA\nnw+gZ7yOX0X+OFYsx5ZsiOZe0AqjnEvfqKTdh03DDtxuAYv0f4hZdHhGgfNXaaW/\nmO9YhQ+6MAo+VK1lM8yWccQ+9uIgLsrmX9Ycx3reZieA/ytIanixkkLWdenmzN7K\nM7kn5Lm1EJtaJx+ez8o39og2kDeP0m89HJ1stwSwNwNcvF1+HiOqhNKvg7acBOOq\naq0QDEq3ODR6iKaMCvwxzh9vY/RC/sfkxX1lH7h41AXEHpEBFJmXBKIpqNwpI9VV\n5uJTISVSpajbeeRFzbYgycmruSA8hvpTHosGCltO+xdezoLBMfDVOeykM6tluqIt\nFWCV+O45uQhauMUXEcSyypBQb4Cs9nBiQTbBZnHe2FysD7a5/BcVZiI7pktuoTMo\n5mh21caN6uN3zoh4Hb7fzPTOSgwYfQWqts2Y751e1A6TJFOBD/gaW3WxI+RScwrg\nRaBp0+F9wOjwpbXUGPoHKi/fVT0pvh83XyasDz3X9odzAgMBAAE=\n-----END PUBLIC KEY-----\n",
+  "publicKeySha256": "1a3160862cb8b887c33d9493ef99e47439ce9e9b0a7f5457f02d0cfe0545e868",
   "releaseId": 0,
-  "filename": "SmartVoice-TJ41.apk",
-  "sizeBytes": 62022581,
-  "sha256": "57b8c1c64013683c05505ea37481dc4252da5b0ed17ce75603c7666913cc0727",
+  "filename": "SmartVoice-TJ42.apk",
+  "sizeBytes": 62028864,
+  "sha256": "278281ce2fcbed028c68a0ec9e160ad175e8ddafa2170ba5c810f6bed4099f90",
   "packageName": "tts.smartvoice.umedjon",
-  "versionCode": 4149,
-  "versionName": "5.2.33-TJ",
+  "versionCode": 4150,
+  "versionName": "5.2.34-TJ",
   "signingCertificateSha256": "5d1d676dfddad74da47b5486b4dbe9bf66b68e67c7c256d144ec0bdf3f0ed95b",
   "testOnly": false,
-  "tagName": "v5.2.33-TJ",
-  "releaseNotes": "• Тестовый выпуск для проверки обнаружения, скачивания и установки обновлений. Функции приложения не изменены.\n"
+  "tagName": "v5.2.34-TJ",
+  "releaseNotes": "• Добавлена поддержка загрузки обновлений с Google Диска.\n• Сохранены прогресс, отмена, докачка и проверки безопасности APK.\n• В диагностике загрузки отдельно учитываются ожидание сети и запись файла.\n"
 }
