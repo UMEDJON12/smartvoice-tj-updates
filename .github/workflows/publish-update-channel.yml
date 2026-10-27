@@ -21,14 +21,14 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           python3 - <<'PY'
-          import base64,glob,hashlib,json,os,re,subprocess,tempfile,urllib.error,urllib.parse,urllib.request
+          import base64,glob,hashlib,json,os,re,subprocess,tempfile,time,urllib.error,urllib.parse,urllib.request
           from pathlib import Path
           REPO='UMEDJON12/smartvoice-tj-updates'
           CERT='5d1d676dfddad74da47b5486b4dbe9bf66b68e67c7c256d144ec0bdf3f0ed95b'
           assert os.environ['GITHUB_REPOSITORY']==REPO
           API='https://api.github.com/repos/'+REPO
           def api(path,method='GET',data=None):
-              request=urllib.request.Request(API+path,method=method,data=json.dumps(data).encode() if data is not None else None,headers={'Authorization':'Bearer '+os.environ['GH_TOKEN'],'Accept':'application/vnd.github+json','Content-Type':'application/json'})
+              request=urllib.request.Request(API+path,method=method,data=json.dumps(data).encode() if data is not None else None,headers={'Authorization':'Bearer '+os.environ['GH_TOKEN'],'Accept':'application/vnd.github+json','Content-Type':'application/json','Cache-Control':'no-cache'})
               with urllib.request.urlopen(request,timeout=60) as r:
                   body=r.read();return json.loads(body) if body else None
           class SafeRedirect(urllib.request.HTTPRedirectHandler):
@@ -49,6 +49,14 @@ jobs:
                       total+=len(chunk);assert total<=limit;out.write(chunk);digest.update(chunk)
               assert total==asset['size'] and asset['digest']=='sha256:'+digest.hexdigest()
           release=api('/releases/latest')
+          if os.environ.get('GITHUB_EVENT_NAME')=='release':
+              event=json.loads(Path(os.environ['GITHUB_EVENT_PATH']).read_text())
+              target=event['release']
+              if target['draft'] or target['prerelease']:raise SystemExit('Preview does not update the stable channel')
+              for attempt in range(10):
+                  if release['id']==target['id']:break
+                  time.sleep(3);release=api('/releases/latest')
+              if release['id']!=target['id']:raise SystemExit('Published release is not latest; stable channel retained')
           assert not release['draft'] and not release['prerelease']
           assert re.fullmatch(r'v[0-9]+\.[0-9]+\.[0-9]+-TJ',release['tag_name'])
           assets={a['name']:a for a in release['assets']}
