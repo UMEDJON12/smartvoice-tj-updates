@@ -1,0 +1,235 @@
+name: Verify direct draft APK upload
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'checks/full-upload-request.json'
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: smartvoice-full-direct-draft-upload
+  cancel-in-progress: true
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Open scoped session and verify uploaded APK
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          python3 - <<'PY'
+          import base64
+          import glob
+          import hashlib
+          import hmac
+          import json
+          import os
+          from pathlib import Path
+          import re
+          import subprocess
+          import tempfile
+          import time
+          import urllib.error
+          import urllib.parse
+          import urllib.request
+          
+          REPO = "UMEDJON12/smartvoice-tj-updates"
+          PACKAGE = "tts.smartvoice.umedjon.full"
+          CERT = "5d1d676dfddad74da47b5486b4dbe9bf66b68e67c7c256d144ec0bdf3f0ed95b"
+          API = "https://api.github.com"
+          
+          
+          class SafeRedirect(urllib.request.HTTPRedirectHandler):
+              def redirect_request(self, req, fp, code, msg, headers, newurl):
+                  p = urllib.parse.urlsplit(newurl)
+                  host = p.hostname or ""
+                  if p.scheme != "https" or not (host in ("github.com", "api.github.com") or host.endswith(".githubusercontent.com")):
+                      raise RuntimeError("Unexpected redirect")
+                  nxt = super().redirect_request(req, fp, code, msg, headers, newurl)
+                  if host != urllib.parse.urlsplit(req.full_url).hostname:
+                      nxt.remove_header("Authorization")
+                  return nxt
+          
+          
+          def main():
+              os.umask(0o077)
+              assert os.environ["GITHUB_REPOSITORY"] == REPO
+              token = os.environ["GH_TOKEN"]
+              run_id = os.environ["GITHUB_RUN_ID"]
+          
+              def api(path, method="GET", data=None):
+                  req = urllib.request.Request(API + "/repos/" + REPO + path,
+                      data=json.dumps(data).encode() if data is not None else None,
+                      method=method, headers={"Authorization": "Bearer " + token,
+                          "Accept": "application/vnd.github+json", "Content-Type": "application/json",
+                          "X-GitHub-Api-Version": "2026-03-10"})
+                  with urllib.request.urlopen(req, timeout=90) as response:
+                      raw = response.read()
+                      return json.loads(raw) if raw else None
+          
+              def get_file(path, ref="main"):
+                  try:
+                      obj = api("/contents/" + path + "?ref=" + ref)
+                  except urllib.error.HTTPError as exc:
+                      if exc.code == 404:
+                          return None, None
+                      raise
+                  return json.loads(base64.b64decode(obj["content"])), obj["sha"]
+          
+              def put_file(path, data, message):
+                  _, sha = get_file(path)
+                  body = {"message": message, "branch": "main", "content": base64.b64encode((json.dumps(data, ensure_ascii=False, indent=2) + "\n").encode()).decode()}
+                  if sha:
+                      body["sha"] = sha
+                  api("/contents/" + path, "PUT", body)
+          
+              def command(args, data=None):
+                  result = subprocess.run(args, input=data, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                  if result.returncode:
+                      raise RuntimeError("Required cryptographic or SDK command failed")
+                  return result.stdout
+          
+              def sdk_tool(name):
+                  for root in (os.environ.get("ANDROID_HOME"), os.environ.get("ANDROID_SDK_ROOT"), "/usr/local/lib/android/sdk"):
+                      if root:
+                          matches = sorted(glob.glob(root + "/build-tools/*/" + name), reverse=True)
+                          if matches:
+                              return matches[0]
+                  raise RuntimeError("Missing Android SDK tool: " + name)
+          
+              request, _ = get_file("checks/full-upload-request.json", os.environ["GITHUB_SHA"])
+              assert request and request["schemaVersion"] == 1 and request["repository"] == REPO
+              assert request["packageName"] == PACKAGE and request["signingCertificateSha256"] == CERT
+              assert re.fullmatch(r"[a-f0-9]{24}", request["requestId"])
+              assert re.fullmatch(r"SmartVoice[-A-Za-z0-9_.]+\.apk", request["filename"])
+              assert re.fullmatch(r"[a-f0-9]{64}", request["sha256"])
+              assert hashlib.sha256(request["publicKeyPem"].encode()).hexdigest() == request["publicKeySha256"]
+              tag = request.get("tagName")
+              if tag:
+                  assert re.fullmatch(r"v[0-9]+\.[0-9]+\.[0-9]+-TJ-Full", tag)
+                  try:
+                      api("/git/ref/tags/" + urllib.parse.quote(tag, safe=""))
+                  except urllib.error.HTTPError as exc:
+                      if exc.code != 404:
+                          raise
+                      head = api("/git/ref/heads/main")
+                      api("/git/refs", "POST", {"ref": "refs/tags/" + tag, "sha": head["object"]["sha"]})
+              assert isinstance(request["testOnly"], bool)
+              if request.get("releaseId"):
+                  release = api("/releases/" + str(int(request["releaseId"])))
+              else:
+                  tag = request["tagName"]
+                  assert re.fullmatch(r"v[0-9]+\.[0-9]+\.[0-9]+-TJ-Full", tag)
+                  matches = [item for item in api("/releases?per_page=100") if item["tag_name"] == tag]
+                  assert len(matches) <= 1
+                  release = matches[0] if matches else api("/releases", "POST", {"tag_name": tag,
+                      "target_commitish": "main", "name": "SmartVoice " + request["versionName"],
+                      "body": request.get("releaseNotes", ""), "draft": True,
+                      "prerelease": request["testOnly"], "make_latest": "false"})
+              assert release["draft"] is True
+              if tag and release["tag_name"] != tag:
+                  release = api("/releases/" + str(release["id"]), "PATCH", {"tag_name": tag, "draft": True})
+              with tempfile.TemporaryDirectory(prefix="smartvoice-direct-check-") as temporary:
+                  work = Path(temporary)
+                  public = work / "client-public.pem"
+                  public.write_text(request["publicKeyPem"])
+                  keys, iv = os.urandom(64), os.urandom(16)
+                  encrypted = command(["openssl", "enc", "-aes-256-cbc", "-K", keys[:32].hex(), "-iv", iv.hex()], token.encode())
+                  wrapped = command(["openssl", "pkeyutl", "-encrypt", "-pubin", "-inkey", str(public),
+                      "-pkeyopt", "rsa_padding_mode:oaep", "-pkeyopt", "rsa_oaep_md:sha256", "-pkeyopt", "rsa_mgf1_md:sha256"], keys)
+                  context = b"SmartVoice scoped upload token v1\0" + request["requestId"].encode() + b"\0" + REPO.encode() + b"\0"
+                  mac = hmac.new(keys[32:], context + iv + encrypted, hashlib.sha256).hexdigest()
+                  session = {"schemaVersion": 1, "requestId": request["requestId"], "repository": REPO,
+                      "publicKeySha256": request["publicKeySha256"], "runId": run_id,
+                      "encryptedToken": base64.b64encode(encrypted).decode(), "validForSeconds": 900,
+                      "wrappedKeys": base64.b64encode(wrapped).decode(), "iv": base64.b64encode(iv).decode(), "hmacSha256": mac,
+                      "permissions": ["contents:write"], "releaseId": release["id"]}
+                  put_file("checks/full-upload-session.json", session, "Open encrypted short-lived draft upload session")
+                  print("Scoped encrypted session ready; no plaintext credential is logged", flush=True)
+                  try:
+                      deadline = time.monotonic() + 900
+                      client_result = None
+                      while time.monotonic() < deadline:
+                          obj, _ = get_file("checks/full-upload-client-result.json")
+                          if obj and obj.get("requestId") == request["requestId"]:
+                              assert obj["status"] == "uploaded"
+                              client_result = obj
+                              break
+                          time.sleep(5)
+                      if client_result is None:
+                          raise RuntimeError("Direct upload session expired")
+                      release = api("/releases/" + str(release["id"]))
+                      assert release["draft"] is True
+                      assets = {x["name"]: x for x in release["assets"]}
+                      apk_asset, update_asset = assets[request["filename"]], assets["update-full.json"]
+                      assert apk_asset["size"] == request["sizeBytes"]
+                      assert apk_asset["digest"] == "sha256:" + request["sha256"]
+          
+                      def download(asset, target, expected_size, expected_hash=None):
+                          url = API + "/repos/" + REPO + "/releases/assets/" + str(asset["id"])
+                          req = urllib.request.Request(url, headers={"Authorization": "Bearer " + token,
+                              "Accept": "application/octet-stream", "X-GitHub-Api-Version": "2026-03-10"})
+                          size, digest = 0, hashlib.sha256()
+                          with urllib.request.build_opener(SafeRedirect()).open(req, timeout=150) as response, target.open("wb") as output:
+                              while True:
+                                  block = response.read(1024 * 1024)
+                                  if not block:
+                                      break
+                                  size += len(block)
+                                  assert size <= expected_size
+                                  digest.update(block)
+                                  output.write(block)
+                          assert size == expected_size
+                          assert asset["digest"] == "sha256:" + digest.hexdigest()
+                          if expected_hash:
+                              assert digest.hexdigest() == expected_hash
+          
+                      apk, update_file = work / request["filename"], work / "update-full.json"
+                      download(apk_asset, apk, request["sizeBytes"], request["sha256"])
+                      download(update_asset, update_file, update_asset["size"])
+                      update = json.loads(update_file.read_text())
+                      for field in ("packageName", "versionCode", "versionName", "sizeBytes", "sha256", "signingCertificateSha256"):
+                          assert update[field] == request[field]
+                      assert update["testOnly"] is request["testOnly"]
+                      assert update["variant"] == "full"
+                      expected_url = ("https://github.com/" + REPO + "/releases/download/" + urllib.parse.quote(request["tagName"], safe="") + "/" + urllib.parse.quote(request["filename"])) if request.get("tagName") else apk_asset["browser_download_url"]
+                      if request.get("tagName"):
+                          assert release["tag_name"] == request["tagName"]
+                      assert update["apkUrl"] == expected_url
+                      signature = command([sdk_tool("apksigner"), "verify", "--print-certs", str(apk)]).decode()
+                      certificates = re.findall(r"certificate SHA-256 digest: ([a-fA-F0-9]+)", signature)
+                      assert len(certificates) == 1 and certificates[0].lower() == CERT
+                      badging = command([sdk_tool("aapt"), "dump", "badging", str(apk)]).decode()
+                      match = re.search(r"package: name='([^']+)' versionCode='([0-9]+)' versionName='([^']+)'", badging)
+                      assert match and match.group(1) == PACKAGE and int(match.group(2)) == request["versionCode"] and match.group(3) == request["versionName"]
+                      minimum = re.search(r"sdkVersion:'([0-9]+)'", badging)
+                      assert minimum and int(minimum.group(1)) == update["minSdk"]
+                      anonymous_status = None
+                      try:
+                          with urllib.request.urlopen(API + "/repos/" + REPO + "/releases/" + str(release["id"]), timeout=30) as response:
+                              anonymous_status = response.status
+                      except urllib.error.HTTPError as exc:
+                          anonymous_status = exc.code
+                      assert anonymous_status != 200
+                      result = {"schemaVersion": 1, "requestId": request["requestId"], "runId": run_id,
+                          "status": "success", "testOnly": request["testOnly"], "published": False, "releaseId": release["id"],
+                          "draftUrl": release["html_url"], "filename": request["filename"], "sizeBytes": request["sizeBytes"],
+                          "sha256": request["sha256"], "versionCode": request["versionCode"], "versionName": request["versionName"],
+                          "packageName": PACKAGE, "signingCertificateSha256": CERT, "apkDownloadedAndVerified": True,
+                          "jsonDownloadedAndVerified": True, "signatureVerified": True, "anonymousReleaseStatus": anonymous_status}
+                      put_file("checks/full-upload-check-result.json", result, "Record independently verified draft APK and JSON upload")
+                      print(json.dumps(result, ensure_ascii=False), flush=True)
+                      with open(os.environ["GITHUB_STEP_SUMMARY"], "a", encoding="utf-8") as output:
+                          output.write("APK and update-full.json downloaded and verified with Android SDK tools. Original certificate, package, version, file sizes and SHA-256 verified. Release remains a draft.\n")
+                          output.write(release["html_url"] + "\n")
+                  finally:
+                      active, sha = get_file("checks/full-upload-session.json")
+                      if active and active.get("requestId") == request["requestId"]:
+                          api("/contents/checks/full-upload-session.json", "DELETE", {"message": "Close completed temporary upload session", "sha": sha, "branch": "main"})
+          
+          
+          if __name__ == "__main__":
+              main()
+          PY
