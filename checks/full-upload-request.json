@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 1,
+  "requestId": "b112ad32364d585110843c69",
+  "repository": "UMEDJON12/smartvoice-tj-updates",
+  "publicKeyPem": "-----BEGIN PUBLIC KEY-----\nMIIBojANBgkqhkiG9w0BAQEFAAOCAY8AMIIBigKCAYEAtU8xW/agKtoeJXFQdl4n\n2JHZs31GAhMst27AM0LKRIIp21iXHWgDNlbR9nfgnsXZgJ85saVZEnNZT6TS5iVb\nPdrgkvX98ciMP7QN9zwN7Q1obmnXvxdCxdvO8MJBWrmOEcvcgrqnNu0sg6afA4Mk\nf6T7jd0QI+sJFt+jVHRpOLYremkryXFeENbtSPvLqCazzfefpwbXlQVOMEThCE1j\nF3g7jbsPXdZOTO0QkJJb9w6J9Gc2kEENFMZUTCPT2vtbXS41Ho+epifaddm0HmjC\nYSYH0uCR+PxSm3T3XJ/DnwkAazczn4RBVHQF9sBSwj2TAtmGViy2uYk/5xIi4Cj5\nKsIdG2VDVeSD2Lbujc2FQvABbW0gM0F3ExSZGP/ak8wS8qtmzNA6yz+qtZYgrOOs\n/4KWVPaFw2uacdscNna/gmFmgM1F2dTcAEjdpJbvQNeEF/zamJ2Ye9FmoTDtHDsc\nH4NQhj7IkN4mzZi62KwhWkkH/3z62DC9iujoad3izOaNAgMBAAE=\n-----END PUBLIC KEY-----\n",
+  "publicKeySha256": "57e3fc66422fb6a915b3171f960f3523645418052ca74a01eef953ae590a372b",
+  "releaseId": 0,
+  "filename": "SmartVoice-TJ-Full-5.2.33.apk",
+  "sizeBytes": 632550901,
+  "sha256": "d789f7bc5e611bf6d0f3b61389d2ec7a78949487625b41d901fe8dcec8046e9d",
+  "packageName": "tts.smartvoice.umedjon.full",
+  "versionCode": 4149,
+  "versionName": "5.2.33-TJ-Full",
+  "signingCertificateSha256": "5d1d676dfddad74da47b5486b4dbe9bf66b68e67c7c256d144ec0bdf3f0ed95b",
+  "testOnly": false,
+  "tagName": "v5.2.33-TJ-Full",
+  "releaseNotes": "# SmartVoice TJ Full 5.2.33\n\nВыпуск предназначен для проверки владельцем перед публичной публикацией.\n\nОснова — исходный код обычной версии 5.2.32 с переносом встроенных голосов и особенностей Full 5.2.31.\nMilena Full назначается основным голосом при новой установке, Yuri Full доступен отдельно. Milena Compact остаётся резервным голосом; выбранный пользователем аварийный голос сохраняет приоритет.\nПакет: tts.smartvoice.umedjon.full, код версии 4149. Устанавливается отдельно от обычной версии и обновляет предыдущую Full с прежней подписью.\n\nПеренесены изменения выбора языков, обработки одиночных букв, быстрого обнаружения обновлений, скачивания и восстановления загрузки, резервных копий, громкости и уведомлений. Таджикский исключён из выбора и автоматического определения согласно исходному коду 5.2.32.\n\nВ GitHub используются отдельные процедуры Full и updates/full.json. Канал появляется только после публикации владельцем. При публикации Full снимите флажок «Set as latest release», чтобы Latest оставался у обычной версии.\n\nПроверки выполнялись с имитацией Android API; реальный телефон и нативное звучание не проверены. Перед публикацией проверьте установку, Milena Full, Yuri Full, выбранный аварийный голос, Compact, папки, импорт и обновления на телефоне.\n\nСборка: offline_build_tools/rebuild_umedjon.py build-input/SmartVoice-UMEDJON15.apk output.apk. Нужен собственный исходный ключ в keystore/smartvoice_umedjon.p12 и пароль через SMARTVOICE_KEYSTORE_PASSWORD. Ключ и пароль не включены в исходный архив.\n\nПолные исходники находятся в архиве Source. Две части каждого ZIP нужно скачать в одну папку; распаковывать первую .001, программа прочитает вторую автоматически. Для объединения на компьютере можно последовательно соединить байты .001 и .002 и открыть полученный ZIP.\n"
+}
