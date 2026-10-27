@@ -1,26 +1,13 @@
-name: Publish verified Google Drive update
+# Disabled at the owner's request on 2026-10-27.
+# Updates remain on GitHub; do not resume Google Drive setup without a new request.
+# The existing publish-update-channel.yml continues to publish updates/stable.json.
+name: Google Drive publishing (disabled)
 on:
-  release:
-    types: [published]
   workflow_dispatch:
-permissions:
-  contents: write
-concurrency:
-  group: smartvoice-google-drive-channel
-  cancel-in-progress: false
+permissions: {}
 jobs:
-  publish:
+  disabled:
+    if: ${{ false }}
     runs-on: ubuntu-latest
-    timeout-minutes: 20
     steps:
-      - uses: actions/checkout@v4
-        with:
-          ref: main
-          persist-credentials: false
-      - name: Copy owner-published APK, verify public download, then update Drive channel
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GDRIVE_CLIENT_ID: ${{ secrets.GDRIVE_CLIENT_ID }}
-          GDRIVE_CLIENT_SECRET: ${{ secrets.GDRIVE_CLIENT_SECRET }}
-          GDRIVE_REFRESH_TOKEN: ${{ secrets.GDRIVE_REFRESH_TOKEN }}
-        run: python3 tools/drive_publisher.py
+      - run: echo "Google Drive publishing is disabled."
