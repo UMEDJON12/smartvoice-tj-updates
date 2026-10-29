@@ -8,6 +8,7 @@ on:
   workflow_dispatch:
 permissions:
   contents: write
+  id-token: write
 concurrency:
   group: smartvoice-published-channel
   cancel-in-progress: true
@@ -17,6 +18,7 @@ jobs:
     timeout-minutes: 10
     steps:
       - name: Verify public release before updating the small channel file
+        id: publish_channel
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
@@ -88,3 +90,50 @@ jobs:
           api(path,'PUT',body)
           print(json.dumps({'ready':True,'versionName':data['versionName'],'versionCode':data['versionCode'],'releaseId':release['id'],'publicApkDownloadedAndVerified':True}))
           PY
+
+      - name: Authenticate only the release workflow for FCM
+        if: github.event_name == 'release' || github.event_name == 'workflow_dispatch'
+        id: fcm_auth
+        uses: google-github-actions/auth@7c6bc770dae815cd3e89ee6cdf493a5fab2cc093
+        with:
+          workload_identity_provider: projects/1074074358850/locations/global/workloadIdentityPools/smartvoice-github/providers/github-release
+          service_account: smartvoice-release-notifier@smartvoice-updates.iam.gserviceaccount.com
+          token_format: access_token
+          access_token_scopes: https://www.googleapis.com/auth/firebase.messaging
+          access_token_lifetime: 300s
+          create_credentials_file: false
+          export_environment_variables: false
+      - name: Send an announcement after verified publication
+        if: github.event_name == 'release' || github.event_name == 'workflow_dispatch'
+        env:
+          FCM_ACCESS_TOKEN: ${{ steps.fcm_auth.outputs.access_token }}
+          VALIDATE_ONLY: ${{ github.event_name != 'release' }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          python3 - <<'PY'
+          import base64,json,os,urllib.request
+          from pathlib import Path
+          API='https://api.github.com/repos/UMEDJON12/smartvoice-tj-updates'
+          def api(path,method='GET',data=None):
+              req=urllib.request.Request(API+path,method=method,data=json.dumps(data).encode() if data is not None else None,headers={'Authorization':'Bearer '+os.environ['GH_TOKEN'],'Accept':'application/vnd.github+json','Content-Type':'application/json'})
+              with urllib.request.urlopen(req,timeout=30) as r:
+                  body=r.read();return json.loads(body) if body else None
+          channel=api('/contents/updates/stable.json?ref=main')
+          data=json.loads(base64.b64decode(channel['content']))
+          assert data['ready'] is True and data['testOnly'] is False and data['variant']=='standard' and data['packageName']=='tts.smartvoice.umedjon'
+          release=api('/releases/latest')
+          assert not release['draft'] and not release['prerelease'] and release['tag_name']=='v'+data['versionName']
+          if os.environ.get('GITHUB_EVENT_NAME')=='release':
+              event=json.loads(Path(os.environ['GITHUB_EVENT_PATH']).read_text());assert event['release']['id']==release['id']
+          validate=os.environ['VALIDATE_ONLY']=='true'
+          payload={'validate_only':validate,'message':{'topic':'smartvoice-standard','android':{'priority':'HIGH','ttl':'604800s','collapse_key':'smartvoice-release'},'data':{'schema':'1','kind':'smartvoice-update','packageName':data['packageName'],'variant':data['variant'],'versionCode':str(data['versionCode']),'versionName':data['versionName'],'minSdk':str(data['minSdk'])}}}
+          req=urllib.request.Request('https://fcm.googleapis.com/v1/projects/smartvoice-updates/messages:send',method='POST',data=json.dumps(payload).encode(),headers={'Authorization':'Bearer '+os.environ['FCM_ACCESS_TOKEN'],'Content-Type':'application/json'})
+          with urllib.request.urlopen(req,timeout=30) as r:result=json.load(r)
+          report={'versionName':data['versionName'],'versionCode':data['versionCode'],'validateOnly':validate,'acceptedByFcm':True,'deviceDeliveryConfirmed':False,'messageName':result.get('name',''),'runId':os.environ['GITHUB_RUN_ID']}
+          path='/contents/checks/push-delivery.json';body={'message':'Record FCM announcement validation' if validate else 'Record accepted SmartVoice update announcement','branch':'main','content':base64.b64encode((json.dumps(report,indent=2)+'\n').encode()).decode()}
+          try:body['sha']=api(path+'?ref=main')['sha']
+          except urllib.error.HTTPError as e:
+              if e.code!=404:raise
+          api(path,'PUT',body);print(json.dumps(report))
+          PY
+
