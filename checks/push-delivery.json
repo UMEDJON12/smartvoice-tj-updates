@@ -1,9 +1,9 @@
 {
-  "versionName": "5.2.36-TJ",
-  "versionCode": 4152,
-  "validateOnly": true,
+  "versionName": "5.2.37-TJ",
+  "versionCode": 4153,
+  "validateOnly": false,
   "acceptedByFcm": true,
   "deviceDeliveryConfirmed": false,
-  "messageName": "projects/smartvoice-updates/messages/3206501238516198789",
-  "runId": "40883254570"
+  "messageName": "projects/smartvoice-updates/messages/-9009066790487290807",
+  "runId": "40894675901"
 }
