@@ -1,0 +1,10 @@
+{
+  "kind": "test-notification",
+  "topic": "smartvoice-standard",
+  "validateOnly": false,
+  "acceptedByFcm": true,
+  "deviceDeliveryConfirmed": false,
+  "messageName": "projects/smartvoice-updates/messages/-1009787309106658185",
+  "runId": "40906637083",
+  "ttlSeconds": 600
+}
