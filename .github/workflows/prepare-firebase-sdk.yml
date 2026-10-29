@@ -1,0 +1,54 @@
+name: Prepare official Firebase SDK
+on:
+  push:
+    paths: ['.github/workflows/prepare-firebase-sdk.yml']
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  resolve:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.10.2'
+      - name: Resolve vendor Maven dependencies
+        run: |
+          mkdir -p /tmp/sv-firebase
+          cat > /tmp/sv-firebase/settings.gradle <<'EOF'
+          rootProject.name='SmartVoiceFirebaseSdk'
+          EOF
+          cat > /tmp/sv-firebase/build.gradle <<'EOF'
+          plugins { id 'java' }
+          repositories { google(); mavenCentral() }
+          configurations { firebaseSdk }
+          dependencies { firebaseSdk 'com.google.firebase:firebase-messaging:24.1.2' }
+          tasks.register('copySdk', Copy) { from configurations.firebaseSdk; into 'vendor' }
+          EOF
+          gradle -p /tmp/sv-firebase --no-daemon copySdk
+      - name: Store reproducible SDK inputs and checksums
+        run: |
+          python3 - <<'PY'
+          import base64,hashlib,json,zipfile
+          from pathlib import Path
+          dest=Path('build-support/firebase-sdk');dest.mkdir(parents=True,exist_ok=True)
+          with zipfile.ZipFile('/tmp/firebase-sdk.zip','w',zipfile.ZIP_DEFLATED) as z:
+            for f in sorted(Path('/tmp/sv-firebase/vendor').iterdir()):z.write(f,f.name)
+          raw=Path('/tmp/firebase-sdk.zip').read_bytes()
+          encoded=base64.b64encode(raw).decode()
+          parts=[]
+          for i,at in enumerate(range(0,len(encoded),60000)):
+            name='sdk.%03d.b64'%i;(dest/name).write_text(encoded[at:at+60000]);parts.append(name)
+          (dest/'manifest.json').write_text(json.dumps({'version':'24.1.2','sha256':hashlib.sha256(raw).hexdigest(),'size':len(raw),'parts':parts,'source':'Official Google Maven and Maven Central; unmodified dependencies'},indent=2)+'\n')
+          PY
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add build-support/firebase-sdk
+          git commit -m 'Prepare official Firebase Messaging 24.1.2 build inputs' || exit 0
+          git push
