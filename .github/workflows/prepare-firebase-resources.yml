@@ -1,0 +1,62 @@
+name: Prepare Firebase Android resources
+on:
+  push:
+    paths: ['.github/workflows/prepare-firebase-resources.yml']
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  resources:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Link SDK resources with an isolated resource package ID
+        run: |
+          python3 - <<'PY'
+          import base64,glob,hashlib,json,os,shutil,subprocess,zipfile,xml.etree.ElementTree as ET
+          from pathlib import Path
+          manifest=json.loads(Path('build-support/firebase-sdk/manifest.json').read_text())
+          raw=base64.b64decode(''.join((Path('build-support/firebase-sdk')/n).read_text() for n in manifest['parts']))
+          assert hashlib.sha256(raw).hexdigest()==manifest['sha256']
+          Path('/tmp/vendor.zip').write_bytes(raw);zipfile.ZipFile('/tmp/vendor.zip').extractall('/tmp/sdk-vendor')
+          merged=Path('/tmp/sdk-res');merged.mkdir();values={}
+          for aar in sorted(Path('/tmp/sdk-vendor').glob('*.aar')):
+            with zipfile.ZipFile(aar) as z:
+              for name in z.namelist():
+                if not name.startswith('res/') or name.endswith('/'):continue
+                rel=Path(name).relative_to('res');data=z.read(name)
+                if rel.parts[0].startswith('values') and rel.suffix=='.xml':
+                  cfg=values.setdefault(rel.parts[0],{})
+                  for child in ET.fromstring(data):
+                    key=(child.tag,child.get('name'),child.get('type'))
+                    if child.tag=='declare-styleable' and key in cfg:
+                      old=cfg[key];existing={c.get('name') for c in old}
+                      for c in child:
+                        if c.get('name') not in existing:old.append(c)
+                    else:cfg[key]=child
+                else:
+                  dest=merged/rel;dest.parent.mkdir(parents=True,exist_ok=True);dest.write_bytes(data)
+          for folder,items in values.items():
+            root=ET.Element('resources')
+            for item in items.values():root.append(item)
+            dest=merged/folder/'merged.xml';dest.parent.mkdir(parents=True,exist_ok=True)
+            ET.ElementTree(root).write(dest,encoding='utf-8',xml_declaration=True)
+          home=os.environ['ANDROID_HOME'];aapt=sorted(glob.glob(home+'/build-tools/*/aapt2'))[-1]
+          android=sorted(glob.glob(home+'/platforms/android-*/android.jar'))[-1]
+          Path('/tmp/sdk-manifest.xml').write_text('<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="tts.smartvoice.firebase.sdk"><uses-sdk android:minSdkVersion="21"/><application/></manifest>')
+          subprocess.run([aapt,'compile','--dir',str(merged),'-o','/tmp/compiled-res.zip'],check=True)
+          subprocess.run([aapt,'link','-I',android,'--manifest','/tmp/sdk-manifest.xml','--package-id','0x80','--allow-reserved-package-id','--output-text-symbols','/tmp/sdk-symbols.txt','-o','/tmp/firebase-resources.apk','/tmp/compiled-res.zip'],check=True)
+          with zipfile.ZipFile('/tmp/firebase-resources.zip','w',zipfile.ZIP_DEFLATED) as z:
+            z.write('/tmp/firebase-resources.apk','firebase-resources.apk');z.write('/tmp/sdk-symbols.txt','sdk-symbols.txt')
+          raw=Path('/tmp/firebase-resources.zip').read_bytes();enc=base64.b64encode(raw).decode()
+          dest=Path('build-support/firebase-resources');dest.mkdir(parents=True,exist_ok=True);parts=[]
+          for i,at in enumerate(range(0,len(enc),60000)):
+            name='resources.%03d.b64'%i;(dest/name).write_text(enc[at:at+60000]);parts.append(name)
+          (dest/'manifest.json').write_text(json.dumps({'sha256':hashlib.sha256(raw).hexdigest(),'size':len(raw),'parts':parts,'resourcePackageId':128},indent=2)+'\n')
+          PY
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add build-support/firebase-resources
+          git commit -m 'Prepare isolated Firebase resource package for offline build'
+          git push
