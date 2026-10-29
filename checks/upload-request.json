@@ -1,18 +1,18 @@
 {
   "schemaVersion": 1,
-  "requestId": "8d45907f34ec2c43139eb0de",
+  "requestId": "ac10c24d254486b7c2b14f22",
   "repository": "UMEDJON12/smartvoice-tj-updates",
-  "publicKeyPem": "-----BEGIN PUBLIC KEY-----\nMIIBojANBgkqhkiG9w0BAQEFAAOCAY8AMIIBigKCAYEA49EL+tKvLhnNuQjOru/Y\nhJJGc/yehyU1admLYexUw++PrBCksyts3bg39NZe7nE8bvglXkMkovsozBiF+gHF\nNPms+x/NC9IG6w9YnpMhxiyUlZlDFrwyxiKUrIf3n2rb1MHaF6D1p4WDFshWiyVR\nagM6LhjOlvIXrBkvjFmgI7jTJdIkKxgflvzZFz8v2M++PLPKw1snxV5ovMnVN/AC\nsYeHFoTQUmMyc42ForoeElyJOKCIJhcrS2yEaK34NROC3SXtr1x6PI11PVst81HB\neVnniMOE3xAzIr3mEmVFR1AM9ox1ES6/+RPw3ZhnQR7NUnydR0kJoE3n6kZ4tz7I\nVgbNCjCovXJB5tzMSM8IGZMCyu5uExmDGka96FZ3NspOkIQIEfERLYTTeMrE/xyd\nMBRylk1Gpa7PDfVB/NOQkd3o0cTkPJOXLoBWtJeJc+UlAJ0XeBOqDHkVr2zIJ/NF\nZoKB/ikgqUrLNhU3IbCynR4fRtBXu8QIdOCq+k9wrkRlAgMBAAE=\n-----END PUBLIC KEY-----\n",
-  "publicKeySha256": "fd3c58d53346c60d0d15234dc742def745fcbf5ba5bda668f5b9916db2213fc8",
+  "publicKeyPem": "-----BEGIN PUBLIC KEY-----\nMIIBojANBgkqhkiG9w0BAQEFAAOCAY8AMIIBigKCAYEA2z47jBbFmQOXBv+zdGzr\nTq5bn9mb4lkOFbi8z2rMaQP6reWmrpq6ErvpmXGPgt4g3zly/DO6mJTi7zdenxyZ\ngiEjt0/K1psn/T5OW4m2KV27Utuj2XOZaiMP1u5yL1p6naodQILDvJlpLn3WJoDO\nIhmcx9Tl1jr0E3Ffe9c8TMV0YCTOErUmOg5UaajBsoFuVfUB2v0xl20QrRs8OnV/\n6mJmMTQwevdiypE6NyuuyiOEO1FeHy+HkRrJMfnfXVxy6aJEyyolpi8z0Y2NoNFH\n1KOqbDRE+mWcFQZIqoXgaJhMC4cuFhTXF7wlUMyFMdaALo+ViWghhzc1zXP4Yybn\nvruziJaG5OW8diV0F6CPjVMUwSsHSlJBXtW3mntjbQLL8vVLFcEu4G3TCgsYq44t\naLYfc+0lgQL9/jUIECu/S98S6uHoA4x2e9V8iAP0xhaKn6NSx2PVhIbWYTMxrD33\n4UmiyF0fXEIbRme1nqcYBCoxL9AzVszxVgG3t8IFfrN3AgMBAAE=\n-----END PUBLIC KEY-----\n",
+  "publicKeySha256": "ae0cf0c748ec9f8f5f0436b6db505d838aa18935e0e5a929fc00aa07ac41777d",
   "releaseId": 0,
-  "filename": "SmartVoice-TJ45.apk",
-  "sizeBytes": 68063742,
-  "sha256": "0e311fe0d8516bed5bc181b1f9f5dfcfaa8c75229f13f9a94ed255f82dfa98f2",
+  "filename": "SmartVoice-TJ46.apk",
+  "sizeBytes": 68065213,
+  "sha256": "8c18a1656c3b40cbac6b010479b8a4eb1825f79cfce8e7fbb149c526577e9309",
   "packageName": "tts.smartvoice.umedjon",
-  "versionCode": 4153,
-  "versionName": "5.2.37-TJ",
+  "versionCode": 4154,
+  "versionName": "5.2.38-TJ",
   "signingCertificateSha256": "5d1d676dfddad74da47b5486b4dbe9bf66b68e67c7c256d144ec0bdf3f0ed95b",
   "testOnly": false,
-  "tagName": "v5.2.37-TJ",
-  "releaseNotes": "• Исправлена потеря окончания речи при высокой скорости для голосов из папок.\n• Другим TTS-приложениям доступны отдельные установленные локальные голоса и варианты качества. Явно выбранная модель не заменяется на Compact.\n• Добавлены уведомления о новых версиях после публикации на GitHub и отдельный переключатель уведомлений. Проверка обновлений при входе и уведомления настраиваются независимо.\n• Расширена диагностика выбора языка, синтеза, ускорения и отмены речи.\n"
+  "tagName": "v5.2.38-TJ",
+  "releaseNotes": "• Исправлено переключение на английский голос в параметрах ссылки после слов «вопросительный знак».\n• Сохранён отдельный голос пунктуации: названия знаков читаются им, а адрес и параметры — голосом для ссылок. Обычный текст после ссылки продолжает читаться по языковым правилам.\n"
 }
