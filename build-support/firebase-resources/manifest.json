@@ -1,0 +1,9 @@
+{
+  "sha256": "37ee0348694d1168b3240986bad4ca4de47f8e3125717c11b929e5641592cf56",
+  "size": 75879,
+  "parts": [
+    "resources.000.b64",
+    "resources.001.b64"
+  ],
+  "resourcePackageId": 128
+}
