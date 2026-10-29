@@ -36,7 +36,7 @@ sv_permissions="$(gcloud iam roles describe smartVoiceReleaseSender --project="$
 [ "$sv_permissions" = 'cloudmessaging.messages.create' ] || { echo 'Unexpected permissions in sender role'; exit 1; }
 sv_retry gcloud projects add-iam-policy-binding "$sv_project" --member="serviceAccount:$sv_account" --role="$sv_role" --condition=None >/dev/null
 if ! gcloud iam workload-identity-pools describe "$sv_pool" --project="$sv_project" --location=global >/dev/null 2>&1; then
- gcloud iam workload-identity-pools create "$sv_pool" --project="$sv_project" --location=global --display-name='SmartVoice GitHub release workflow'
+ gcloud iam workload-identity-pools create "$sv_pool" --project="$sv_project" --location=global --display-name='SmartVoice GitHub releases'
 fi
 sv_mapping='google.subject=assertion.sub,attribute.repository_id=assertion.repository_id,attribute.repository_owner_id=assertion.repository_owner_id,attribute.ref=assertion.ref,attribute.workflow_ref=assertion.workflow_ref,attribute.event_name=assertion.event_name'
 # A published release runs at its tag, not refs/heads/main. Reject every
