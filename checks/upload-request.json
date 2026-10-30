@@ -1,18 +1,18 @@
 {
   "schemaVersion": 1,
-  "requestId": "1b7ae320a0bdd10d733277dd",
+  "requestId": "de1f6a2a1ae81afdcb1e19f7",
   "repository": "UMEDJON12/smartvoice-tj-updates",
-  "publicKeyPem": "-----BEGIN PUBLIC KEY-----\nMIIBojANBgkqhkiG9w0BAQEFAAOCAY8AMIIBigKCAYEA4FpF2j6ogEZP53Envi5K\n3DGGfcoCymetzwyAq0ZnRvIYxwutcEQ764q8msEGVTqxImBJybtKlrzEQIYvk2W6\nIiUt9FteP9gdf51F1vUp9DUz+d+PbjGRJT2dr29xhByIW3HyuNEXIVIepsNytvFm\na8AQxX0Q9rmIrINZ6pNg6/vptFwh3DE71Y4sGM9Opxygu81R3gln8JIgWl2at2LF\nRAG3HwlgVpUxE4UeityNrX1D92678QD5xcGmsXSQMrKboHCo0nB61z8u1n3AKedi\nujjALV+5sc7ee+GtzA0T8DB8DQtGVoB74SwP/gquvWkpCZJdrJPPKL5Vdl8qAQo7\neJWoDkZWbqvPjXW2D4bF9jkRc5FyelE/6sUfIG0HjKihr0gYSfR63iCx3x/fK2mR\nefM+kWeQPRudwyFrFUd92Shjq/umZZcsTJ+NPER4YJPmHpnP4zDZ2VcFfuSOAq8C\nVHao3UNAzbDcvZ60TOJbDOpYHwlseyevSdoQ7IE4wdhrAgMBAAE=\n-----END PUBLIC KEY-----\n",
-  "publicKeySha256": "ae0b2f2a8adba0e8f56dee93dfb98eaa2ad0665f50d67546f190f7d418781a32",
+  "publicKeyPem": "-----BEGIN PUBLIC KEY-----\nMIIBojANBgkqhkiG9w0BAQEFAAOCAY8AMIIBigKCAYEAsTBPPFi4aiKhNXRHS2ju\nCd4V2/B1o21G6AWIZFrjOZ5q+8bFgw+e81eAdLTjX51ncG4AeoG+s9dAWzht88LF\n0hbKMo+RMMvyX0DRKxAA4Qp7Lcd7dK1Gev975khaQxStk+pL8Teu1EJI9PUIN/NV\nEeHa2o2ceD30lhhTgsDe8xOajADPjfb90TuwFoFo+gwGZ1XW1T4uA7ZgV5ydkAkL\nJ2yBQlxMPWVH3BFrYdMQ69UdXDpRVGyjdWoJKetMNm3ztViBkSs7y+pIjwOm048y\nLNbBHyyf5J8UuzxIRVqqUrwX4XhSMK2OptEB+j1M141p79pFZ33os3B50BrVQ25T\n+gNsvP+OeLYu55IroOkCH5bui2koMEXbeFHEldZ0laufGR4PbASAyWxrshYwkVyl\nz67uJ+xWlw1EvL5RkkKw4u/gLI9XbN3bOgaE1lTyNk/7NFRGrZ4XpQ+2mIqftMNt\n/1IOWkoQhtIiBl5l2HXLqSk2rR5GPOASQ/nkPHN90d1jAgMBAAE=\n-----END PUBLIC KEY-----\n",
+  "publicKeySha256": "4208da0b6b812afe328da712e41852d67786b555c8f70b36a702a067ed3c903e",
   "releaseId": 0,
-  "filename": "SmartVoice-TJ47.apk",
-  "sizeBytes": 68088637,
-  "sha256": "81db16993b17f4790240325c82537bc40e889f2f4db26f90c6484e59b6c11af1",
+  "filename": "SmartVoice-TJ48.apk",
+  "sizeBytes": 68097634,
+  "sha256": "5331776d209f80b725aeed4b1938bd346fdf085824f9f1e7c6f68aa1510fe685",
   "packageName": "tts.smartvoice.umedjon",
-  "versionCode": 4155,
-  "versionName": "5.2.39-TJ",
+  "versionCode": 4156,
+  "versionName": "5.2.40-TJ",
   "signingCertificateSha256": "5d1d676dfddad74da47b5486b4dbe9bf66b68e67c7c256d144ec0bdf3f0ed95b",
   "testOnly": false,
-  "tagName": "v5.2.39-TJ",
-  "releaseNotes": "• В окне выбора голоса добавлены скорость, громкость и тон. Перед подтверждением можно прослушать голос с выбранными параметрами; отмена сохраняет прежние настройки.\n• В разделе «Настроить голоса» добавлена кнопка «Прослушать» для текущего варианта голоса и его параметров.\n• Тексты для прослушивания стали длиннее. Регуляторы озвучивают своё название, значение и диапазон.\n"
+  "tagName": "v5.2.40-TJ",
+  "releaseNotes": "• Исправлена подготовка звука при прослушивании голосов Microsoft и других голосов. Убран лишний проход через преобразователь частоты; расширена поддержка форматов WAV.\n• Исправлено направление вьетнамского текста к английскому и турецкому голосам, включая отдельные слова.\n• Сохранены языки, уже распознанные основным анализатором. Улучшена обработка других письменностей, японского и корейского текста.\n• Сохранён приоритет отдельных голосов чисел, времени, ссылок и пунктуации. В диагностику добавлен результат прослушивания.\n"
 }
