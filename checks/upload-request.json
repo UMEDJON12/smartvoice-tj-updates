@@ -1,18 +1,18 @@
 {
   "schemaVersion": 1,
-  "requestId": "51b7c40da8f63fbf08e12e35",
+  "requestId": "5e55ddc2d4984ac5d1a6262d",
   "repository": "UMEDJON12/smartvoice-tj-updates",
-  "publicKeyPem": "-----BEGIN PUBLIC KEY-----\nMIIBojANBgkqhkiG9w0BAQEFAAOCAY8AMIIBigKCAYEAwOUVr6y85DODciMQZfrq\nfS1w0Pmm2oMeKgnGjJfKgU5aTA8yVrtO61OAhe4HWukJ5ad/LIiXCiaNm06HK7Qy\nwMZGuIVwCgsoc3WmSOli6ZwRIeIwqZgbUfe5ev2kiFlsbUE/ZnNlA7PRTrhUEOQk\n1OP+Wlq6/iSbjz6sGWDMWkqeVdtYY4GjJLoXdmJUPOK8oWQTxdgKbZFkDIDfZIh7\n9CnDzs9IWDrWkewTrzNoe0fcL3BDvBKuQRKR1nJdpur8Al+HpVsKzRz3uv+ci5DF\nqgZ6OyzcnUv4YEXlIaEbB3s3+ATmk/ru7k8ElJxZHU1fPzlp5VdFATguYJvVYBfC\nX5CMPGAG/TJe7GecL5UKcyRuE3oGmuWqIWxxgfoUJNvc9dRRmIGN0Td+yXTE7GB/\nPFQEv1v8Ab+XRG79h7vrstJg+uj67w7XjrQYog8P9I8xpOgkr/lYAmA5CrS0FFNO\nsGLuJ7do4r7oAIUVUd3Kkt26bYtDZd7EaD4PHyALXHu7AgMBAAE=\n-----END PUBLIC KEY-----\n",
-  "publicKeySha256": "dddd40785b5e6ae9bfc7e3cd08a90e441736b4091e7dd936f3746a6e357b1ac0",
+  "publicKeyPem": "-----BEGIN PUBLIC KEY-----\nMIIBojANBgkqhkiG9w0BAQEFAAOCAY8AMIIBigKCAYEAvLNzHPs5P11GrqJBSFU3\n1bHbyMsbSV4XIDtf45qzQY2VCjCB1F6234IS+v1kUCkTzcs4zeq8fDaSJD0WA/IJ\nKKUJt3ni14ZmYo1erofsrSPiJM1o/eHPdpJmx0Kok6PKsZc7aEObYHVCc1Yhph7f\n5f+eckZrJRxuzvAsgZdtWlQb7MoUBdGL8rf8H432Xz32tIxiOAJc4PFi2CN8yt11\nnxFawy9eAK1Ry1lQXldhlG4kig5VgKwexi5Li2RNNxBcdjJCHp8LjbvPiLYZw1Z1\nnnkhG/VwHOo79voMhNDTeL8fX0I5vDGVC9RXRUCHV3VudNW/r1ZDZnfsYwNgHEjO\nVSGWetD56gz9fFL6dYrbQZM4S+WgwI45x4DLjPrXblgmK/MwmoJwjcBb7K+ZtLc8\nuqppig9v1ToznOO1EN8Vz7PPetnnnHAhvO3YlimxZCVBmXgGnm44D5WN9HdPIjAu\n+KpWFv47fL9vmZkkJGWB6s/9uhCXszmuXUEvpaJDY2//AgMBAAE=\n-----END PUBLIC KEY-----\n",
+  "publicKeySha256": "e54fd4f7c6000b4127a33f056fb47a48069c3ada53aaffe1836cec2e1755ce9b",
   "releaseId": 0,
-  "filename": "SmartVoice-TJ51.apk",
-  "sizeBytes": 68309268,
-  "sha256": "010dd34c53ebc3661f3b96c017535241bed641bdebc278fbe75d4fec5dbca238",
+  "filename": "SmartVoice-TJ52.apk",
+  "sizeBytes": 68320451,
+  "sha256": "cb6378b706c48dca72fd68c867149e38e9efdb2fba5418b547b4d9b087ca33ba",
   "packageName": "tts.smartvoice.umedjon",
-  "versionCode": 4159,
-  "versionName": "5.2.43-TJ",
+  "versionCode": 4160,
+  "versionName": "5.2.44-TJ",
   "signingCertificateSha256": "5d1d676dfddad74da47b5486b4dbe9bf66b68e67c7c256d144ec0bdf3f0ed95b",
   "testOnly": false,
-  "tagName": "v5.2.43-TJ",
-  "releaseNotes": "• Исправлено сохранение общих файлов Google при импорте выбранного голоса, его экспорте и удалении соседних голосов.\n• Исправлена инициализация локального движка Google; диагностика показывает исходную причину отказа модели.\n• Исправлено ложное определение остановки синтезатора, когда уже полученный звук ещё передаётся для воспроизведения.\n• Длинные задания для таджикского Sadoi разделяются на меньшие части. Добавлена проверка завершённого аудиофайла при отсутствии завершающего сигнала движка.\n• Улучшено направление коротких таджикских слов при чтении недавно озвученного таджикского абзаца по словам. Контекст ограничен источником и выбранным голосом.\n"
+  "tagName": "v5.2.44-TJ",
+  "releaseNotes": "• Согласованы параметры прослушивания и обычного чтения: учитываются последние скорость и тон скринридера, а также индивидуальные параметры голоса. Это действует в выборе голосов, управлении голосами и проверке перед импортом.\n• Для Sadoi и локальных Google/Microsoft ограничена чрезмерная скорость, передаваемая самому движку. Оставшееся ускорение выполняется обработкой звука; итоговая установленная скорость сохраняется.\n• Исправлено повышение тона очень коротких фрагментов при дополнительном ускорении.\n• Для Sadoi добавлено дочитывание недостающего звука из полностью завершённого WAV. Уже переданная часть проверяется по SHA-256; повторное чтение начала, незавершённые файлы и отменённые запросы не допускаются.\n• После фактической замены зависшего экземпляра Sadoi разрешена ограниченная контрольная попытка основного голоса, чтобы не удерживать аварийный голос лишние15секунд.\n• Дополнена диагностика: конкретный диктор Google, параметры синтеза и состояние аудиофайла при тайм-ауте.\n"
 }
