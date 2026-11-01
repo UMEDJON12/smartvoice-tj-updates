@@ -1,18 +1,18 @@
 {
   "schemaVersion": 1,
-  "requestId": "68825a27136801b457d77749",
+  "requestId": "8aa6768048995a9405645a76",
   "repository": "UMEDJON12/smartvoice-tj-updates",
-  "publicKeyPem": "-----BEGIN PUBLIC KEY-----\nMIIBojANBgkqhkiG9w0BAQEFAAOCAY8AMIIBigKCAYEAvK/1dtaL2E9uK1vpGNoC\nO9XdEBdI3MTcFvlJOPaSRM1UG+CGoeKuvfcghMT//KeYmecAYnQkurdPNXm0gC6z\nLmd9S7PEK6x8XKNCFEC5VnsO/lnWt30v/jUeDZ7LNprPXEZPJSStY21T9AW9DkIR\nQxv2fOIwrgydeAulbmQ8Y9s09xW1mzdDXR9lk6AuBx9M7FKG7V6XMkZjgEvLCPL0\nQ0ZOnqPOHt71Ed9G0NOoL0hW7rvOGGdWkWczqfKR3hjMzC4TdQMVb9h2+YjKyK9E\nEr9442tCRoM0RGqpGsKyXZwKmki2E6inMxJ6SC9hV7xn3ektbWvmVpAwQCkYFjEM\nsp8zxAAFbNdNroGOfBru8usorzn28m/+XVSeKHWFZj8cApXp2Dz7iJjjviJKkeR1\n9kyr3nUth72Kg6/DlwubLgfyY7KF1IZyAXt7ofeWTp69KvrTXKKz3b3QxK3VNQy3\nwMg35+ZZ9Ks0vkGE84Bj3bgTg6zuuq5Xoy25uqnO2n09AgMBAAE=\n-----END PUBLIC KEY-----\n",
-  "publicKeySha256": "dfa60df9f0fa2dddc8610687b0e70d0873bd30e60cfbaac350ac4eeef92b6741",
+  "publicKeyPem": "-----BEGIN PUBLIC KEY-----\nMIIBojANBgkqhkiG9w0BAQEFAAOCAY8AMIIBigKCAYEAjtE7c38MDH+logj1/p4d\nKpFX6bxzq/hs7TFVLD9P8NDNPQ0150CBMGkt8d9N47DpYmVXSxs2NcqkQ/iv7O/5\nevoKYw8VM1j4KUa+tH67J795ryLkgSUNiEvIsEE1wPjOWuqCAFq7hiWhd8Zn0ani\nVrlcnzqUZ9vSaDaJRqcpLqO1bDYp+brg/F4d3YYw49iG9lp97IjCvTbxv27pHuap\ng5GovHwyGiBS5WhuU8J94r7doCe8UDQfv1L2dmn6w8T4pyvNWoZqRPXxUYGNluW7\nEQkZC7EudjE2YvbV7/pcf7axcyoBiAxwj/4ZVWHXcFH7M+fM8pTplJD+yYfoGaar\n6wSAFlt0GK3CD83bTcdXE3SVXAMaI7rQotJ2dbCbkydaxFeNGo0d0Bt3f97FKBN6\ndqebjFGOIyZYgoQrVIdZwF2WmU23r0OpWqLaJr2GnOALb21YnJsSPOCwJCMDnHBO\npl274MiND6p8asfRT8VLiiHZiTkaBnVGa1pt5gCIwPa3AgMBAAE=\n-----END PUBLIC KEY-----\n",
+  "publicKeySha256": "bef4adde14d44debcebf495e6e3ab3ca90e25000d39c8234685625e98dfb3022",
   "releaseId": 0,
-  "filename": "SmartVoice-TJ49.apk",
-  "sizeBytes": 68126286,
-  "sha256": "c198174a2e0ffd2858f71eb686c26000275dbd1c69c14c36a1b62766fbe32e3b",
+  "filename": "SmartVoice-TJ50.apk",
+  "sizeBytes": 68131641,
+  "sha256": "c07f82ee9696a3ee7a42198a723f1d303a2168c809d826900611ec279c156446",
   "packageName": "tts.smartvoice.umedjon",
-  "versionCode": 4157,
-  "versionName": "5.2.41-TJ",
+  "versionCode": 4158,
+  "versionName": "5.2.42-TJ",
   "signingCertificateSha256": "5d1d676dfddad74da47b5486b4dbe9bf66b68e67c7c256d144ec0bdf3f0ed95b",
   "testOnly": false,
-  "tagName": "v5.2.41-TJ",
-  "releaseNotes": "• Добавлен импорт локальных моделей Google из полной копии GoogleTTS. Учитываются общие зависимости моделей; неполные пакеты получают понятное объяснение.\n• Перед импортом ZIP можно выбрать отдельные голоса, найти их по названию и прослушать без постоянной установки.\n• Возвращён таджикский язык: выбор TTS, автоматическое распознавание и сохранение назначений. Добавлено распознавание разговорных форм и приоритет для неоднозначной кириллицы.\n• Ошибка отдельного фрагмента больше не должна обрывать последующий текст. Добавлена диагностика недоступных моделей без изменения выбранных голосов.\n• При недоступном голосе смайликов их названия подготавливаются на языке доступного резервного голоса. Убраны попытки озвучить персидские и другие неподдерживаемые письменности русским встроенным резервом.\n• Сохранены прежние назначения, автоназначение в пустые поля и исходные голосовые данные.\n"
+  "tagName": "v5.2.42-TJ",
+  "releaseNotes": "• Исправлено исчезновение импортированных Google-моделей при выборе отдельных голосов: учтены разные обозначения одного пути в Android. Перед установкой повторно проверяется наличие выбранных моделей.\n• Повреждённый набор больше не скрывает остальные голоса и не прерывает обновление каталога. Исправные Google, Microsoft и голоса из папок остаются доступны; для неполных наборов показана возможность восстановления из ZIP.\n• Исправлено согласование выбранного таджикского TTS с распознаванием. Сохранённое назначение восстанавливает распознавание однократно; последующее ручное отключение сохраняется.\n• Устранён конфликт таджикских фраз с украинским правилом слова «як». Добавлены проверки текста и отдельных слов из диагностики.\n• Уточнено сообщение о неполном английском пакете Google: отсутствующие модели пропускаются, остальные можно импортировать.\n• В диагностику добавлены состояние автоматического распознавания и решение таджикского маршрута. Назначения, подпись и голосовые данные сохранены.\n"
 }
