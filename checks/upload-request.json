@@ -1,18 +1,18 @@
 {
   "schemaVersion": 1,
-  "requestId": "9ee7bcf7c5c32454b6f34c20",
+  "requestId": "635f38f796931eaa76c693a0",
   "repository": "UMEDJON12/smartvoice-tj-updates",
-  "publicKeyPem": "-----BEGIN PUBLIC KEY-----\nMIIBojANBgkqhkiG9w0BAQEFAAOCAY8AMIIBigKCAYEAvHYZWkI3Hzdor8iBctwC\nLhlNfRykD7B7gYmoDmNlNCAmRxom4O24HU1t9pHzk99wenWqjxYEPEoB4gvzwaRe\nOQsO3y1XeB5ZgG8sv7/8z/j5e5CqwUaxeTsVcgU5y2ZjjNj584gnVL0wHBWRxdb0\noc5cQArR4Wj1iM26SapuvzzRKlHMtTqCewKPltW+BkoX+s4VKUqyOEJXkclHXMMg\n3oBVyXEf0Anw6O0R8paNHulJJ4mvtjF4p5C/gIhz5QglEBo5ZgQjJ11MHwWBlrGD\n5U66OPqnCiiSCklXNHIOhwZgbwyrnJr1/8MiBUHr7MCcZN//wa+4dE/1l3zld0G/\n8hSRWf2qVRal/w619V5/DleIocoooWqUA4MR8ww2bDp4z4bmpXDv0tmdDNYbF9z3\ngcMRmqu5iZIHivZRT5SFqSwc++qLwvJ3rrzSijqQM38J62K6ZLX21uYibfIJIQ62\nXcJova0Q2wCeFuW3TZpVu6h0SU9TjIZz0Otmh+fdrEFFAgMBAAE=\n-----END PUBLIC KEY-----\n",
-  "publicKeySha256": "974cc483e1f5670e65fc4357ae23effe85cc3016498f2a470fdf25991e557e7c",
+  "publicKeyPem": "-----BEGIN PUBLIC KEY-----\nMIIBojANBgkqhkiG9w0BAQEFAAOCAY8AMIIBigKCAYEAxuANidni2V6lTKw0RotU\nbqmfWQTRTsXn8sadetbiHh75WQtTzVyzJstbe8BsGES2epcjyNObmbhFJYZhvJSp\n+1e0YA3EMeZ9bq3awpfiscoBMszzJiduGEnGGtlgnEHOkx2+oqotZ9rLuZjjyLXn\nZdiCBrj4ulKfyWcXhfI0gxOz3GoecY6qqn38Qo6e1Bl/V2Umb/ZMvn8LAp8JdpiL\nuTvQhbGgX8UMozBMiRBUbQ2S4hPGo7fjwrli+L+f54B6L2G3KReWwuPPAM8WfJZl\nbtiq7FPO5QeCltKz5tiYsXwROKjVYtxmWim9N12syTvSK8Xre9Da9pXXSP02KQ8A\nuz+QCN2x04rWv6mDnbWxUmIGfTjKGmwHEpyRqaMc9tYFD6TyMweEGdMsufbM4b6m\naQa2KV3b0ewWMrrOwT5h/9UgsKDcdUUyclENc9hgDOUv6Izg2zLH+p1Erm2Z+Cyu\nZ9S6/r/iEJCYRcGNdYm5cOxhr0q5ZFpJuHz6ap4ONN7TAgMBAAE=\n-----END PUBLIC KEY-----\n",
+  "publicKeySha256": "547dd9e21f35836edba4c0dec9f3ec4bf603291bfa129002482aee04f19c7c26",
   "releaseId": 0,
-  "filename": "SmartVoice-TJ55.apk",
-  "sizeBytes": 68348801,
-  "sha256": "6c9d55bea1b2f5b1d6601b151e49d523531b8f496654209c4aad223ca03a7c9a",
+  "filename": "SmartVoice-TJ56.apk",
+  "sizeBytes": 68354673,
+  "sha256": "9dafa3e5f02340f0d921c938d9de1cb2c971c7fc94b8b6d71648f55afee5ae3b",
   "packageName": "tts.smartvoice.umedjon",
-  "versionCode": 4163,
-  "versionName": "5.2.47-TJ",
+  "versionCode": 4164,
+  "versionName": "5.2.48-TJ",
   "signingCertificateSha256": "5d1d676dfddad74da47b5486b4dbe9bf66b68e67c7c256d144ec0bdf3f0ed95b",
   "testOnly": false,
-  "tagName": "v5.2.47-TJ",
-  "releaseNotes": "• Исправлена передача внутреннего кода арабских Google-моделей: в списке остаётся общий арабский, а движок получает нужный ему ar-XA.\n• При отказе загрузки с общими переопределениями добавлена одна повторная попытка с собственным pipeline выбранной модели, как в GoogleTTS Player. Модель и диктор сохраняются.\n• Исправлена очистка неудачной попытки и повторное открытие файла pipeline. Добавлена диагностика обеих попыток загрузки.\n"
+  "tagName": "v5.2.48-TJ",
+  "releaseNotes": "• Добавлено автоматическое восстановление трёх известных повреждённых файлов арабского Google-пакета ar-XA r47. Восстановленные файлы проверяются по исходным SHA-256 Google; неизвестные изменения сохраняются. Повторный импорт уже установленных голосов не требуется.\n• Исправлен независимый выбор конкретного диктора для языка, времени, чисел и других назначений. Выбор голоса в одном разделе больше не меняет диктора в другом.\n• Убраны фоновые попытки восстановления синтезаторов, которые остались только в старых настройках вариантов и больше нигде не назначены.\n• Расширены проверка файлов frontend Google и диагностика отказов загрузки. В новых резервных копиях настроек указывается установленная версия приложения.\n"
 }
