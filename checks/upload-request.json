@@ -1,18 +1,18 @@
 {
   "schemaVersion": 1,
-  "requestId": "5e55ddc2d4984ac5d1a6262d",
+  "requestId": "729feea1c025f4d6bcb29edf",
   "repository": "UMEDJON12/smartvoice-tj-updates",
-  "publicKeyPem": "-----BEGIN PUBLIC KEY-----\nMIIBojANBgkqhkiG9w0BAQEFAAOCAY8AMIIBigKCAYEAvLNzHPs5P11GrqJBSFU3\n1bHbyMsbSV4XIDtf45qzQY2VCjCB1F6234IS+v1kUCkTzcs4zeq8fDaSJD0WA/IJ\nKKUJt3ni14ZmYo1erofsrSPiJM1o/eHPdpJmx0Kok6PKsZc7aEObYHVCc1Yhph7f\n5f+eckZrJRxuzvAsgZdtWlQb7MoUBdGL8rf8H432Xz32tIxiOAJc4PFi2CN8yt11\nnxFawy9eAK1Ry1lQXldhlG4kig5VgKwexi5Li2RNNxBcdjJCHp8LjbvPiLYZw1Z1\nnnkhG/VwHOo79voMhNDTeL8fX0I5vDGVC9RXRUCHV3VudNW/r1ZDZnfsYwNgHEjO\nVSGWetD56gz9fFL6dYrbQZM4S+WgwI45x4DLjPrXblgmK/MwmoJwjcBb7K+ZtLc8\nuqppig9v1ToznOO1EN8Vz7PPetnnnHAhvO3YlimxZCVBmXgGnm44D5WN9HdPIjAu\n+KpWFv47fL9vmZkkJGWB6s/9uhCXszmuXUEvpaJDY2//AgMBAAE=\n-----END PUBLIC KEY-----\n",
-  "publicKeySha256": "e54fd4f7c6000b4127a33f056fb47a48069c3ada53aaffe1836cec2e1755ce9b",
+  "publicKeyPem": "-----BEGIN PUBLIC KEY-----\nMIIBojANBgkqhkiG9w0BAQEFAAOCAY8AMIIBigKCAYEAwIpECVczk6a2HhEMiG7G\nJgjk7siDdOx4ptnTl5kIfFfOx/bkng9j/admUlz2Ncd6rHgDlltqBgQs6dp/003u\ncMOx+gOIkjKyCw2GQ8CdeqB3pOY5f7dJeFoIuNhL3z93DPn8ECfJ/6CxQr1KWAzA\nBfumiQdywn0b219lZVAUXBR1ouE86gQLwjAyArHAEkGzDPHyPDpTn+jXdlMRP0jH\njZG8U2JsjOS+r5ExXpWgqvod3uZvxSfB55tY5uap9R3ndU0Kgc29NcDB9ZjXLpwf\nDn/57r+BnrwX/g0nl0awyTUu9xJH/1Qa4gzOz+P6CJerKOI3DFuc6pGKsuqOdi3p\nUHyR+px3LfsCZmHXGBWEH+sUpK81FNvH+sQ7PAX4tzYJtYrqy53kLPW3E0rYHe/Y\naZ3NhYVmqiPMObgpLaTNrwE7mfyzaJYMxmf1RheUtDCjp4PN5aoNt9EGLnUwBhcJ\nO1YgVBIGwYSStYck2Bp6UKuhxbKZNMA2Yv8+8TNvdRN/AgMBAAE=\n-----END PUBLIC KEY-----\n",
+  "publicKeySha256": "d3c6838386fd9ed7862db341cacf4992d2392c0dcc64595d9296ad3167becdb9",
   "releaseId": 0,
-  "filename": "SmartVoice-TJ52.apk",
-  "sizeBytes": 68320451,
-  "sha256": "cb6378b706c48dca72fd68c867149e38e9efdb2fba5418b547b4d9b087ca33ba",
+  "filename": "SmartVoice-TJ53.apk",
+  "sizeBytes": 68342078,
+  "sha256": "9db5e44ece71036e8c27fda4b2c2e9f6de44f715444faee0054c71ddcdd8d913",
   "packageName": "tts.smartvoice.umedjon",
-  "versionCode": 4160,
-  "versionName": "5.2.44-TJ",
+  "versionCode": 4161,
+  "versionName": "5.2.45-TJ",
   "signingCertificateSha256": "5d1d676dfddad74da47b5486b4dbe9bf66b68e67c7c256d144ec0bdf3f0ed95b",
   "testOnly": false,
-  "tagName": "v5.2.44-TJ",
-  "releaseNotes": "• Согласованы параметры прослушивания и обычного чтения: учитываются последние скорость и тон скринридера, а также индивидуальные параметры голоса. Это действует в выборе голосов, управлении голосами и проверке перед импортом.\n• Для Sadoi и локальных Google/Microsoft ограничена чрезмерная скорость, передаваемая самому движку. Оставшееся ускорение выполняется обработкой звука; итоговая установленная скорость сохраняется.\n• Исправлено повышение тона очень коротких фрагментов при дополнительном ускорении.\n• Для Sadoi добавлено дочитывание недостающего звука из полностью завершённого WAV. Уже переданная часть проверяется по SHA-256; повторное чтение начала, незавершённые файлы и отменённые запросы не допускаются.\n• После фактической замены зависшего экземпляра Sadoi разрешена ограниченная контрольная попытка основного голоса, чтобы не удерживать аварийный голос лишние15секунд.\n• Дополнена диагностика: конкретный диктор Google, параметры синтеза и состояние аудиофайла при тайм-ауте.\n"
+  "tagName": "v5.2.45-TJ",
+  "releaseNotes": "• Для Google Seanet и lemon исправлен способ изменения скорости: модель синтезирует на обычной скорости, а темп меняет Sonic, как в присланном GoogleTTS Player.\n• Для локальных Google/Microsoft обработка темпа выполняется до преобразования частоты звука и одинакова при прослушивании и обычном чтении. Sonic также используется для дополнительного ускорения Sadoi.\n• Устранена повторная загрузка исправной Google-модели после отмены чтения свайпом. При настоящей ошибке модель по-прежнему освобождается и создаётся заново.\n• В диагностику добавлены алгоритм и место обработки темпа, исходная и итоговая скорость, число переданных аудиобайтов и сохранение модели после отмены.\n"
 }
