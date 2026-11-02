@@ -1,18 +1,18 @@
 {
   "schemaVersion": 1,
-  "requestId": "7867a16112bf505e62ad83b5",
+  "requestId": "c3a9cb44c1f6f58bc0f10fe8",
   "repository": "UMEDJON12/smartvoice-tj-updates",
-  "publicKeyPem": "-----BEGIN PUBLIC KEY-----\nMIIBojANBgkqhkiG9w0BAQEFAAOCAY8AMIIBigKCAYEApi4eqWRVJwN+diq2vXXX\nCtgOjXxQmtMvF4LHO68zCrpYl/U2JiFVAF2WBas9UN8B82nm93H/A0VLCGhZ+qZm\n0fCt8bLibBW26gIkZv4yj8A7TRPY66MfjxKojQFQJ9bAsbXDpQW+WkPCSt7GaS31\nSR3oZ5c6kRH/YuQCEHvYynzYp/ZZv+7J8lIN2m1vQb6q3F5IjZEh1RtFZ/xQUE+M\nmxG/g2fxP5AfshQ51t7t4Aqfkzm1PjuIdprUXWuvdYyLrTolsDMs/nkp/k3YWhrm\ndF79LQ+rnnY/EwPIjViEtUO9dUYCj3Bhq/l/jPeAofnfaOyc6jVA97mJsycjww/v\n7N80UBZOTTzOfvlLQ9b6oCD/UkoqqDcLRqZTLoLlIK5mya113jqPcyIZReLMqwEe\nyzhuuDBWtL6n0EAJ/ergNBpitY/JGeUlj+mNBcBMveO9t6KXfdMzmSBk0PFloSb9\nzoOgSbGBPbmXAhtGyRNz01pdyLGzjvvLQSTmSaLBYWEdAgMBAAE=\n-----END PUBLIC KEY-----\n",
-  "publicKeySha256": "3bcdcabbbd4198a0e25460fcd84a81d860729bbf09f2d4cc2ad640721ea8fb82",
+  "publicKeyPem": "-----BEGIN PUBLIC KEY-----\nMIIBojANBgkqhkiG9w0BAQEFAAOCAY8AMIIBigKCAYEAo3vR/JWu4UAcdKk/ZmKT\nbBOcLqHYobRnDkdBuzaDq1Yrif98zoQWMhzDCkCxdf+5Zj0HdOMQgQEiuGYH3vZ2\nqVMQXygnOnlxxKQS1sTryP3DJU/dSjjzeSm/QkqZ11uoDr6/VnxCS1N8/E8KSkey\n263GQxjp85ZHFvoKn5A0J3v1udN3lBMbe+0FTCZL7FPttO2Mu4c0cUnkAM8DinRh\nJD5vAFao8MyZtiVw6sb+571z2ZvCF9pA8hsvm6c36U79Eo2gZyWogen1ufncoiVH\nB9r9iS29MaRAEM1wRZwAQey5NyM8SbewDkru2qzo9v6jQoYZ4ZISBqfH+s4m9ZGg\nfVl9igKXKBPjfiwTDVx4V3APOKTdaAqWtE8nlwEMuoJ4wA/H90Gp06nkO7ZLmbOz\nkh2zaQd8L2oPkwX4126APDmqHmnZETqNTVbn0l3hfOmYw4BSyg4XZQlnH3k/ex6S\niUFDMsbpH8iKal2ooth+rYEZJRDn7qqSUGdh1tUeMUOtAgMBAAE=\n-----END PUBLIC KEY-----\n",
+  "publicKeySha256": "da390cb7d7df2a8fdf93f41faa06830fb66878282eacb0378d4de66a922bc84e",
   "releaseId": 0,
-  "filename": "SmartVoice-TJ57.apk",
-  "sizeBytes": 68370590,
-  "sha256": "4a171f83ea22dbed2222932fb57350377ccc61d11460d3989ea2fe4b486e58b2",
+  "filename": "SmartVoice-TJ58.apk",
+  "sizeBytes": 63380077,
+  "sha256": "fe67e21817f372cf0d9f7bf0b0fbd981a55c28698ca3c31ba58a1a1676d918a5",
   "packageName": "tts.smartvoice.umedjon",
-  "versionCode": 4165,
-  "versionName": "5.2.49-TJ",
+  "versionCode": 4166,
+  "versionName": "5.2.50-TJ",
   "signingCertificateSha256": "5d1d676dfddad74da47b5486b4dbe9bf66b68e67c7c256d144ec0bdf3f0ed95b",
   "testOnly": false,
-  "tagName": "v5.2.49-TJ",
-  "releaseNotes": "SmartVoice.TJ🇹🇯 5.2.49-TJ\n\n• Исправлено продолжение длинного таджикского текста после остановки «Садои тоҷик»: приложение один раз повторяет тот же фрагмент тем же голосом. Продолжение допускается только при точном совпадении уже переданного звука, без повторения его начала.\n• Восстановленный таджикский синтезатор снова используется, не дожидаясь окончания всего длинного текста. Сохранены отдельные голоса языка, времени и чисел.\n• Сокращено ожидание при подтверждённой остановке «Садои тоҷик». При очень высокой скорости часть ускорения перенесена в обработку звука, чтобы снизить нагрузку на этот синтезатор.\n• Улучшено распознавание таджикских фраз «Сохтани файли» и «ворид карда, тавассути».\n• В управлении голосами добавлено выделение нескольких голосов для удаления и отправки. Удаление требует подтверждения и сохраняет файлы, нужные оставшимся голосам. При отправке каждый голос получает отдельный ZIP; готовые архивы передаются вместе.\n"
+  "tagName": "v5.2.50-TJ",
+  "releaseNotes": "SmartVoice.TJ🇹🇯 5.2.50-TJ\n\n• Уменьшен размер APK примерно на 5 МБ за счёт сжатия программного кода и упаковки. Все голосовые данные, нативные библиотеки и функции сохранены.\n• Ускорено начало длинного текста для локальных голосов Google и Microsoft: первым передаётся небольшой фрагмент с сохранением назначения голоса, слов и защищённых словарных выражений. Короткие фразы не дробятся. Параметры скорости, тона, громкости и обработки звука не меняются.\n• При отправке нескольких голосов добавлен выбор: все голоса в одном ZIP для импорта либо каждый голос отдельным ZIP.\n• Общий ZIP поддерживает разные движки и одноимённые варианты. При импорте доступны выбор голосов и прослушивание, проверка целостности архивов и сохранение общих зависимостей. Установленные наборы с тем же содержимым повторно не заменяются.\n"
 }
