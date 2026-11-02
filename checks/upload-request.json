@@ -1,18 +1,18 @@
 {
   "schemaVersion": 1,
-  "requestId": "7d4681e01b8c3f450a743d37",
+  "requestId": "9ee7bcf7c5c32454b6f34c20",
   "repository": "UMEDJON12/smartvoice-tj-updates",
-  "publicKeyPem": "-----BEGIN PUBLIC KEY-----\nMIIBojANBgkqhkiG9w0BAQEFAAOCAY8AMIIBigKCAYEAuc7PgNMWnTN71pL4DP6G\no8fUentDUOTtXZ76T8w8JBczgQhelaA15g0HTRBue4TioJvA2HXEIy+f3LasTvyO\n5nj8MRSxJRcVUCveTHPYnsM8hlmHW1qNJ/XIXL5BKnMIvNzTq0csxEPYmUhs0SHn\nR+R0VNR4njaExodhxtKwWY1SW/GtGbDvpmnXvPqojcD9JWTUvhwmpivB5pfS7eS8\naXVeF0QSPAoiLF+P7sRnHjTiJZpYJAndjMmS0FnsA0Ew3ODqWurdeV/uqH+LdZv1\nF2XfAs+TA4wXuRk/n9wINxTiuXr0oP+gmFTIoM+0s3bRwW1Wx3eIp/OqEFduuG8X\n4I4Q2bH9VjbqP9btl87aG64rZie9u9G4MQJp0DjWCCqJVzs+JZKGukFrgVG+lcIk\nZtgGI5VktvicTU/mKJo4X5Z0oq23JVMjSm41yGJzErjCjktT6fp6p/Gb+uX/U6Iv\n9NuncgWzRrmJYb+D2F5z6nlcKsCLuQrrjNhXCdOWnLCDAgMBAAE=\n-----END PUBLIC KEY-----\n",
-  "publicKeySha256": "3b7c3d1ac401ede987ff39107125de91cce4bff55307307a9c339c91157cb756",
+  "publicKeyPem": "-----BEGIN PUBLIC KEY-----\nMIIBojANBgkqhkiG9w0BAQEFAAOCAY8AMIIBigKCAYEAvHYZWkI3Hzdor8iBctwC\nLhlNfRykD7B7gYmoDmNlNCAmRxom4O24HU1t9pHzk99wenWqjxYEPEoB4gvzwaRe\nOQsO3y1XeB5ZgG8sv7/8z/j5e5CqwUaxeTsVcgU5y2ZjjNj584gnVL0wHBWRxdb0\noc5cQArR4Wj1iM26SapuvzzRKlHMtTqCewKPltW+BkoX+s4VKUqyOEJXkclHXMMg\n3oBVyXEf0Anw6O0R8paNHulJJ4mvtjF4p5C/gIhz5QglEBo5ZgQjJ11MHwWBlrGD\n5U66OPqnCiiSCklXNHIOhwZgbwyrnJr1/8MiBUHr7MCcZN//wa+4dE/1l3zld0G/\n8hSRWf2qVRal/w619V5/DleIocoooWqUA4MR8ww2bDp4z4bmpXDv0tmdDNYbF9z3\ngcMRmqu5iZIHivZRT5SFqSwc++qLwvJ3rrzSijqQM38J62K6ZLX21uYibfIJIQ62\nXcJova0Q2wCeFuW3TZpVu6h0SU9TjIZz0Otmh+fdrEFFAgMBAAE=\n-----END PUBLIC KEY-----\n",
+  "publicKeySha256": "974cc483e1f5670e65fc4357ae23effe85cc3016498f2a470fdf25991e557e7c",
   "releaseId": 0,
-  "filename": "SmartVoice-TJ54.apk",
-  "sizeBytes": 68347466,
-  "sha256": "edeb9dae5dda5fac7a0b37a75223c54be8f0da7c7092c5dbd110a1b96868ea7f",
+  "filename": "SmartVoice-TJ55.apk",
+  "sizeBytes": 68348801,
+  "sha256": "6c9d55bea1b2f5b1d6601b151e49d523531b8f496654209c4aad223ca03a7c9a",
   "packageName": "tts.smartvoice.umedjon",
-  "versionCode": 4162,
-  "versionName": "5.2.46-TJ",
+  "versionCode": 4163,
+  "versionName": "5.2.47-TJ",
   "signingCertificateSha256": "5d1d676dfddad74da47b5486b4dbe9bf66b68e67c7c256d144ec0bdf3f0ed95b",
   "testOnly": false,
-  "tagName": "v5.2.46-TJ",
-  "releaseNotes": "• Исправлен импорт многоязычных архивов Google: EAR, TSV, общие файлы Locomel и допустимые пустые настройки. Исправлено отображение общего арабского и китайского языка. Поддержан повторный импорт таких голосов после экспорта.\n• Исправлен захват таджикских и русских фрагментов узбекским контекстом в смешанном тексте. Улучшено разделение языков у подписей с двоеточием.\n• Улучшено восстановление выбранного стороннего синтезатора: повторная попытка при чтении и проверка задержавшегося каталога голосов. Сохранён автоматический резервный голос до фактического восстановления.\n• Уменьшены повторные загрузки Google при переключении между Microsoft-голосами без увеличения числа моделей в памяти.\n• После импорта или скачивания русского голоса заменяются нетронутые стартовые назначения Milena Compact для русского и кириллицы; сохраняются явные назначения пользователя и резервный голос.\n• Добавлена диагностика перегрузки при усилении громкости. Голосовые данные и параметры качества моделей сохранены.\n"
+  "tagName": "v5.2.47-TJ",
+  "releaseNotes": "• Исправлена передача внутреннего кода арабских Google-моделей: в списке остаётся общий арабский, а движок получает нужный ему ar-XA.\n• При отказе загрузки с общими переопределениями добавлена одна повторная попытка с собственным pipeline выбранной модели, как в GoogleTTS Player. Модель и диктор сохраняются.\n• Исправлена очистка неудачной попытки и повторное открытие файла pipeline. Добавлена диагностика обеих попыток загрузки.\n"
 }
