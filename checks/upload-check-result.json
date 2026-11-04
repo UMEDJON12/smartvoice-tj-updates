@@ -1,15 +1,15 @@
 {
   "schemaVersion": 1,
-  "requestId": "9912d2f417943dea339f5bed",
-  "runId": "41900410532",
+  "requestId": "060f997b4a7b0ff2237586fb",
+  "runId": "41900939984",
   "status": "success",
   "testOnly": false,
   "published": false,
   "releaseId": 434375044,
-  "draftUrl": "https://github.com/UMEDJON12/smartvoice-tj-updates/releases/tag/untagged-f2a0d56529da33ebda2a",
-  "filename": "SmartVoice-TJ59.apk",
-  "sizeBytes": 63383699,
-  "sha256": "472deada70e1048e0e2b7c6ce9d96a017a7805a0f915ea9799dffee2cb909fcc",
+  "draftUrl": "https://github.com/UMEDJON12/smartvoice-tj-updates/releases/tag/untagged-0b8e46029851571a3ff3",
+  "filename": "SmartVoice-TJ59-r1.apk",
+  "sizeBytes": 63383428,
+  "sha256": "dbc7496d79a9484f4df371eeca6f4521af776ffb67958d34166148c5864d60eb",
   "versionCode": 4167,
   "versionName": "5.2.51-TJ",
   "packageName": "tts.smartvoice.umedjon",
@@ -17,5 +17,5 @@
   "apkDownloadedAndVerified": true,
   "jsonDownloadedAndVerified": true,
   "signatureVerified": true,
-  "anonymousReleaseStatus": 403
+  "anonymousReleaseStatus": 404
 }
