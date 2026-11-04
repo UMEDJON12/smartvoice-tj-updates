@@ -1,18 +1,18 @@
 {
   "schemaVersion": 1,
-  "requestId": "c3a9cb44c1f6f58bc0f10fe8",
+  "requestId": "9912d2f417943dea339f5bed",
   "repository": "UMEDJON12/smartvoice-tj-updates",
-  "publicKeyPem": "-----BEGIN PUBLIC KEY-----\nMIIBojANBgkqhkiG9w0BAQEFAAOCAY8AMIIBigKCAYEAo3vR/JWu4UAcdKk/ZmKT\nbBOcLqHYobRnDkdBuzaDq1Yrif98zoQWMhzDCkCxdf+5Zj0HdOMQgQEiuGYH3vZ2\nqVMQXygnOnlxxKQS1sTryP3DJU/dSjjzeSm/QkqZ11uoDr6/VnxCS1N8/E8KSkey\n263GQxjp85ZHFvoKn5A0J3v1udN3lBMbe+0FTCZL7FPttO2Mu4c0cUnkAM8DinRh\nJD5vAFao8MyZtiVw6sb+571z2ZvCF9pA8hsvm6c36U79Eo2gZyWogen1ufncoiVH\nB9r9iS29MaRAEM1wRZwAQey5NyM8SbewDkru2qzo9v6jQoYZ4ZISBqfH+s4m9ZGg\nfVl9igKXKBPjfiwTDVx4V3APOKTdaAqWtE8nlwEMuoJ4wA/H90Gp06nkO7ZLmbOz\nkh2zaQd8L2oPkwX4126APDmqHmnZETqNTVbn0l3hfOmYw4BSyg4XZQlnH3k/ex6S\niUFDMsbpH8iKal2ooth+rYEZJRDn7qqSUGdh1tUeMUOtAgMBAAE=\n-----END PUBLIC KEY-----\n",
-  "publicKeySha256": "da390cb7d7df2a8fdf93f41faa06830fb66878282eacb0378d4de66a922bc84e",
+  "publicKeyPem": "-----BEGIN PUBLIC KEY-----\nMIIBojANBgkqhkiG9w0BAQEFAAOCAY8AMIIBigKCAYEAqm+Fop2D5kZ+e4/7dxZy\nixMkNQXG4W6rN2YB93LkwGx5QM0nPBWgpIokCc5qU5x601BBoQ4UqfD8u/9uAzag\nUIAAXOASfIwqSCnYcM7njeJWa8qX89SyRmD5gdjaos11oXog4YldvPNltw6ZX1hJ\nLtDJwSzZrEHkIunQjQXkYKglWQkx2ucupMKClCWLNQ7r9H6GLTAnGRdsA6hqWZHd\n8sRjRp9Kd2ncRRH/Iy2cy3OfdAhVvnW7duTwE66zqx2g0hANzw6QZn3GRzUYwbOu\nEpdd4tQPIDwswvoisWLkDpaF/U/Cwt7jOuPKqtxBmcj3Qf5njymRcMPMjgW9zXcA\nUqDGspXVp5VNdUlKN9HOBzuu0YntfbFdATlQJ9GlKxW1YYhdlB2Jd6uWOqqqsm5n\n+SlCpnwcCTsp+2KR9Hq5j1nfTCm2hjdQLQYd1BMQcCfEQPeSD+V7hfrhlm+BtpJt\nCVVw2pQSC9JqTDT//JYSriiawbPhK0rHigMlA6f6OtSvAgMBAAE=\n-----END PUBLIC KEY-----\n",
+  "publicKeySha256": "f9b202b5d5a54dd6f6fb0a7aeec03e87d9ca741d2fdc5466bce2459d104f7b5e",
   "releaseId": 0,
-  "filename": "SmartVoice-TJ58.apk",
-  "sizeBytes": 63380077,
-  "sha256": "fe67e21817f372cf0d9f7bf0b0fbd981a55c28698ca3c31ba58a1a1676d918a5",
+  "filename": "SmartVoice-TJ59.apk",
+  "sizeBytes": 63383699,
+  "sha256": "472deada70e1048e0e2b7c6ce9d96a017a7805a0f915ea9799dffee2cb909fcc",
   "packageName": "tts.smartvoice.umedjon",
-  "versionCode": 4166,
-  "versionName": "5.2.50-TJ",
+  "versionCode": 4167,
+  "versionName": "5.2.51-TJ",
   "signingCertificateSha256": "5d1d676dfddad74da47b5486b4dbe9bf66b68e67c7c256d144ec0bdf3f0ed95b",
   "testOnly": false,
-  "tagName": "v5.2.50-TJ",
-  "releaseNotes": "SmartVoice.TJ🇹🇯 5.2.50-TJ\n\n• Уменьшен размер APK примерно на 5 МБ за счёт сжатия программного кода и упаковки. Все голосовые данные, нативные библиотеки и функции сохранены.\n• Ускорено начало длинного текста для локальных голосов Google и Microsoft: первым передаётся небольшой фрагмент с сохранением назначения голоса, слов и защищённых словарных выражений. Короткие фразы не дробятся. Параметры скорости, тона, громкости и обработки звука не меняются.\n• При отправке нескольких голосов добавлен выбор: все голоса в одном ZIP для импорта либо каждый голос отдельным ZIP.\n• Общий ZIP поддерживает разные движки и одноимённые варианты. При импорте доступны выбор голосов и прослушивание, проверка целостности архивов и сохранение общих зависимостей. Установленные наборы с тем же содержимым повторно не заменяются.\n"
+  "tagName": "v5.2.51-TJ",
+  "releaseNotes": "• Для длинных ссылок с безопасной границей озвучивание может начаться с короткого фрагмента. Длинные последующие фрагменты GoogleLocal передаются движку меньшими заданиями.\n• При быстрых свайпах отменённый локальный запрос не передаёт устаревший звук и не останавливает новый запрос Microsoft.\n• Если Daniel не выдаёт звук на декоративной латинице, SmartVoice пробует один раз прочитать обычные буквы и при необходимости использует выбранный аварийный голос.\n• Улучшено распознавание разговорного таджикского в проверенных фразах. Русские подписи скринридера и отдельные голоса для чисел и букв сохраняются.\n• Диагностика отдельно показывает ожидание локального движка, передачу аудио Android и паузы между речевыми фрагментами.\n"
 }
