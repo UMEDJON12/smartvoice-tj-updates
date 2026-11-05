@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "requestId": "32237f054757a0b67aad454c",
+  "repository": "UMEDJON12/smartvoice-tj-updates",
+  "publicKeySha256": "867305db326949a37df3313f881819fd21ed8eefa785fc6d9332eff7c9d587e6",
+  "runId": "41979276952",
+  "encryptedToken": "P+98qQO8c+/41UryyaBn0GHE6lPY2y0da3GtIOh0GBJlmMX4X9p/xWGxS1373pT/maQk3QFv1ZbpMwhgZ14CU0FVUkcxzsHs/fkrmC+QPSonwdq8UJ9xCiJFtL/GxgcTnggLxzS00kTHT2+9TVnnmB6Ai80ANgkhfZkb+anWAT34fM3NNjBXp+DWNGXDJfyt/+Xaf5/L0AXXGiO35XRkxZwFpgUmpAfZbXJF+Mlwzsi2RVF7QaGFLZBPaIVGeMkkZYg1PHIY859QYp6ODcftZhohMFcyNppUAod2xHiEN4nryYqTDaOl3iPnSeFtNdv0LjfHRDxe3droXz4zMNmZagQS7sLE9xd4vUmFlYEgq1BUVGslPYjMv2J5Fv0QiuhFE2V2VEghLEmWDLQiTXJQUcUKWc6hoPcSvmdpfmCskIw75i2NAZnCz+Bd4sKSM2lf9P75q7oy9V/VVuRg3LgfbZHf/RfIcgKqVl0E2Bz7iNCYLLv/28nfPf5IrfId5gQd",
+  "validForSeconds": 900,
+  "wrappedKeys": "tBKxJwFkM/SMxPRze91SU200U0ZDMZxInkpAJ/AEIxO2SP1bDFC5IvPDlIlPnRkSh6RnzHuWfHt7M2HQn0s8szd3RAFLaq44iSmed4fSRGeqZQSL3H+e3UJ183BcXxVvIcd1m0hRr62//XYYWBnqn6siaZheuMsmEYLfRF+7GjyaPvrf4cnsvGAhgUQp5OBUwvB4zNIT2WCK87HDfrMExWfs6JKTgJ+VjKah+Xby216/SvGNDnXwYCQrr3z1c5U2+YcRW1VoPjvKouWJvao7bYtQPS1teCeDlQOJWgH6Q41QJ4G+7uXfS9YDvX77rfPly2qhCqLohQslXt+7ki48I7bc1EjyRfxixV3D07xEBiV55VPS+cNIullgSJ0iR3a+pEtvDvfG0x8aBefKU/cgPMek85AMZHCx/pmAmrxOL72/4LEcTUB528miwpk/g4Su8m4DqUumBt87aM2nNgkl4J0ArgXKMwLDyHUZ3iGXHQa9PL/4n3KeJtFwMJKm64OH",
+  "iv": "8cSC/H8pi0XVY7VTKQ07Wg==",
+  "hmacSha256": "e043a55856d0896bac904e858aa999baea0e7d4cac547f6490fb681c65bb71ef",
+  "permissions": [
+    "contents:write"
+  ],
+  "releaseId": 434845133
+}
