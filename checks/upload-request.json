@@ -1,18 +1,18 @@
 {
   "schemaVersion": 1,
-  "requestId": "32237f054757a0b67aad454c",
+  "requestId": "a6902c9f119868629a813b26",
   "repository": "UMEDJON12/smartvoice-tj-updates",
-  "publicKeyPem": "-----BEGIN PUBLIC KEY-----\nMIIBojANBgkqhkiG9w0BAQEFAAOCAY8AMIIBigKCAYEA2bZVPWsq0UtqerKAiCUb\nD61+76DklJ7Ye09AozfMDs/7XWJqTrKm8rIag+IIePhDA97Yo5LRp2vPWNzS+Acu\nAEq41VbkuNwRETxO0gxV2J8JCJCFLaZhrT12yHyacJLp3aOSyr+KLmPACHbN1x20\nd7mW2JBVEFFNYbb8wm3GZx0yfl//TtOmbL67tO5vv+37i++b8k5olnvBrtallOyM\nFKppkVVTuyOGi7CapFCMP/fBr8x5AVRJNN0M7q+ahdsx+410552srghtDLQdT+FB\n3yyG0nYeh7TNAXrg15Ya8QID+SUq1mZq3jCGgpDyAdYaELktBj8svIySNpDnxWWn\nOj0L8wLW89a/s7RWGskWA5ffOvgMPe1BFiS73YGaJ+W/JyN6dS/yF6bUh5mX0NUS\nFONp8i5Y+OkjLdmRO3I2Qos/xGlqDMQ/G4ZCqrBOCCxpIOupxwWkIQPiNy0FrHmi\nU2b40Q367jmxQzD8HPbQzLirgVDUA7jWwO1N2qIEgwcDAgMBAAE=\n-----END PUBLIC KEY-----\n",
-  "publicKeySha256": "867305db326949a37df3313f881819fd21ed8eefa785fc6d9332eff7c9d587e6",
+  "publicKeyPem": "-----BEGIN PUBLIC KEY-----\nMIIBojANBgkqhkiG9w0BAQEFAAOCAY8AMIIBigKCAYEAtKhbJVANb5rf9QZqxfhB\n9Il814ZW5H6V5MydLmNPD3/uDgW0buNU4ju1Zr/R7rGw1f6pw8es7T5xDFZt6lIA\n+PCA2Cf9Ri2H0z8Cslp/9EEL8izw8gwoz5MMu5O4v3iE2H1VkEKI927Sr2DQxL2N\n/pPTEgKx7vgQdI1/bKNuo2dI+UGkf82NqkuKve61g0GhLwPe4dBeXi69ywcKG5fl\nVURIFStXPRfMCw8ceZ7WVcEHNN5G55K6sQellhX6b3fomOedYTLIOLjPmByoZCBm\n4lPjtsiMaczbGMU0q9VaCg5uJsixMyEULhNMmiMBta7Zhqzovm6FT41d9Wlp4EQ8\nDKgROB55zDK3m+5K9rSMfSXjodR7uhldBRY0EhGVfhYt3J3EsNkey2Wy/UrZufnw\nB4rKVChOYwIeeNVI5x0pZ4ht46x7ttOrbLNIs303sROMNZ5SIes8fNDe0jVmWUkx\nVbt21RXR3kwZiZ0FKkunnE15SrXEjCCoYm2mdUtMG8MZAgMBAAE=\n-----END PUBLIC KEY-----\n",
+  "publicKeySha256": "c92d4b360b8a82be1edfac433d185a2f73fccee1a1e18a4472d7327f8c8a1b8f",
   "releaseId": 0,
-  "filename": "SmartVoice-TJ60.apk",
-  "sizeBytes": 63388834,
-  "sha256": "d724497f1fa2fb0e0a1bd33ac5ea215a3bd4a34f45833978f1749a9b22743144",
+  "filename": "SmartVoice-TJ61.apk",
+  "sizeBytes": 63405047,
+  "sha256": "b1730d9de0b4b2e2b827026c7a22c5b17ee30959eedcd170f432b4acbf5f9e6b",
   "packageName": "tts.smartvoice.umedjon",
-  "versionCode": 4168,
-  "versionName": "5.2.52-TJ",
+  "versionCode": 4169,
+  "versionName": "5.2.53-TJ",
   "signingCertificateSha256": "5d1d676dfddad74da47b5486b4dbe9bf66b68e67c7c256d144ec0bdf3f0ed95b",
   "testOnly": false,
-  "tagName": "v5.2.52-TJ",
-  "releaseNotes": "• Десятичные числа, фактически направленные таджикскому голосу, подготавливаются без слова «бутун»: например, 2,01 — «дуву аз сад як». Сохраняются разрядность дробной части, отрицательные значения и единицы измерения. Даты, время, ссылки и технические обозначения защищены от такого преобразования.\n• В разделе «Настроить голоса» кнопка «Прослушать» воспроизводит образец прямо с текущими скоростью, громкостью и тоном, с учётом параметров скринридера и дополнительного ускорения. Повторного окна с регуляторами нет. Та же кнопка останавливает прослушивание.\n"
+  "tagName": "v5.2.53-TJ",
+  "releaseNotes": "• Раздел «Загрузка и управление голосами» объединяет скачивание и управление установленными моделями. В каталоге доступны Microsoft, Google, Vocalizer и «Vocalizer — голоса из папки».\n• Добавлены поиск, выбор языка, голоса и качества, сведения о размере и состоянии установки. Обычный загрузчик Vocalizer и ручной импорт ZIP сохранены.\n• Онлайн-загрузка проверяет SHA-256 и содержимое ZIP, автоматически устанавливает голос и использует прежние правила назначения. Поддерживаются отмена и продолжение прерванной загрузки.\n• Уже установленный голос распознаётся до скачивания. Повторная установка и обновление требуют подтверждения и сохраняют настройки; прежняя модель сохраняется при ошибке подготовки замены.\n• Новые проверенные модели и языки появляются из GitHub-каталога без обновления APK. Для просмотра без сети сохраняется последний корректный каталог.\n"
 }
