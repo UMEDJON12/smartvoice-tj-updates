@@ -1,18 +1,18 @@
 {
   "schemaVersion": 1,
-  "requestId": "006e5585b3e0089f30439d0d",
+  "requestId": "ea29333c700a620dda2c6e53",
   "repository": "UMEDJON12/smartvoice-tj-updates",
-  "publicKeyPem": "-----BEGIN PUBLIC KEY-----\nMIIBojANBgkqhkiG9w0BAQEFAAOCAY8AMIIBigKCAYEAkp21Y22m03ZDHngGtEFx\n7qyRzps77ZQk3/MFLe7AV9zWUca0j8PYT1y4l52RTb5WKyBYTpZN+wZHHcTZGiG4\nbxkd5kx6MvbMHcv1zIfwwv4icrmO8EcnodzmQH9KUb2sj9oM2QZjp+vjMttzSPyn\nrwpNnbx2Pr4AVhP7KKUC1yIcKwmETpy5G5jNnRDplRPKemA4wsSIhaaeBVPN5rK+\nUoYGVz4uuqf+jU57axGSxKbKy13BjaFnccUTNtCDCLXB9fpvU/kQD9Epbtr5Znc6\ndi+gITQPf18rjbO0HcCsmkoF7RrmCeez06sjdvnzNs6woSNBG2c7Nw3B2Tmy6iqV\nxupzXPXOHlyrxcyO7s62z2pQcM1p/TBUOfpTFokP2CfZZijNLbRjoQIQtvktKb6Y\nvAYYTMv5y5ayl8d1DA3StKZlFHhELLeylUktE6eNHI2/gRms0WD4oqDCPQKYQhb2\nV0/fTosUAntJkclxBcy14pwyQepaRu95X5J7N82rXj9FAgMBAAE=\n-----END PUBLIC KEY-----\n",
-  "publicKeySha256": "796ce711be9cb1c604eff5a2fdbacf37cf394d62a8de49a10426f0ebfc657733",
+  "publicKeyPem": "-----BEGIN PUBLIC KEY-----\nMIIBojANBgkqhkiG9w0BAQEFAAOCAY8AMIIBigKCAYEAmgr0LuCALXJqVI3SwMO6\nbyVnYwo+2IqK9FEFV3u4s/wqC67isRE0bPNqUbww3zWtSkRdTU1mBj950mZphKZ2\nIcVhrgPLX0IO8Ts3QFl3netJJJMp5E9Uogsoht73e3/7n37LdZI4kN9Pl7EqB28P\nb3mcE5MjXnqg4gynBipB90mvDv/AMSp8Fm9fIOEe7Iu55G13k8708S9v2Ihu/YO3\nopizWT/lHUECnEadczD/m+GgBHwen2yJlHFOWeSOpg64PBLAtqhbGYGLUEzVufBA\nwC70u2A2WbZA9YS52gEJNEaWeapOhwSCvqIw0aJP6SXuZxWh5ww08Mk33583ggKT\nBP688b/mEE7hld4XgA9Wf48MBPbMt9H2GXEXKWjmMxahfyJOT1N0PZGVvkh+Qa/d\nlxpI3xPEEW6BsIJ3PI3wLlmISxl63985bNVH4fvqoyFXsryOyKDK7NnsquFfnWh7\noqeo4nsgVGVyIcnfedh80/Pl/m0CLSd8aCCw3Cqpr5TnAgMBAAE=\n-----END PUBLIC KEY-----\n",
+  "publicKeySha256": "c789fc310289d767a5bdf15981e3ea0cc8e5c230e6853a51da780bb02d689945",
   "releaseId": 0,
-  "filename": "SmartVoice-TJ62.apk",
-  "sizeBytes": 63404929,
-  "sha256": "671a2510f30b0de76c234f49d8be7be1f396cee71c5bbc61b2fdedae3730e02e",
+  "filename": "SmartVoice-TJ63.apk",
+  "sizeBytes": 63406732,
+  "sha256": "c89f2a9d506100e5fd68794d7ff6325848dab509eea825ece4e4c3ca18f465cb",
   "packageName": "tts.smartvoice.umedjon",
-  "versionCode": 4170,
-  "versionName": "5.2.54-TJ",
+  "versionCode": 4171,
+  "versionName": "5.2.55-TJ",
   "signingCertificateSha256": "5d1d676dfddad74da47b5486b4dbe9bf66b68e67c7c256d144ec0bdf3f0ed95b",
   "testOnly": false,
-  "tagName": "v5.2.54-TJ",
-  "releaseNotes": "• В основных настройках теперь два самостоятельных пункта: «Скачать голоса» и «Управление голосами». Промежуточный общий раздел убран.\n• «Скачать голоса» сразу открывает Microsoft, Google, Vocalizer и «Vocalizer — голоса из папки». Управление установленными голосами, ручной импорт ZIP и обычный загрузчик Vocalizer сохранены.\n"
+  "tagName": "v5.2.55-TJ",
+  "releaseNotes": "• В онлайн-каталоге голоса объединены по языкам. В названиях голосов видны регионы и языковые варианты; стандартный китайский и кантонский находятся в общем разделе «Китайский» с разными обозначениями.\n• Добавлена поддержка ресурсов китайских Microsoft-пакетов и региональных обозначений языка. Одинаковые архивы Xiaobei представлены одной моделью.\n• Добавлено прослушивание настоящих образцов выбранных Microsoft-моделей перед загрузкой ZIP. Образец можно остановить той же кнопкой; полный голос для прослушивания не скачивается.\n• Для новых проверенных Microsoft-пакетов GitHub автоматически формирует короткие образцы. Диагностика архивов показывает этап и конкретную причину отказа без публикации секретных данных.\n"
 }
