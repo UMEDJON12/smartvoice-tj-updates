@@ -139,7 +139,7 @@ jobs:
           try:current=json.loads(base64.b64decode(api('/contents/updates/stable.json?ref=main')['content']))
           except urllib.error.HTTPError as e:
               if e.code!=404:raise
-          if current and current.get('versionCode')==data['versionCode'] and current.get('sha256')==data['sha256']:
+          if current and current.get('versionCode')==data['versionCode'] and current.get('sha256')==data['sha256'] and current.get('apkUrl')==data['apkUrl']:
               print(json.dumps({'channelAlreadyCurrent':True,'versionName':data['versionName'],'versionCode':data['versionCode']}))
           else:
               put_content('/contents/updates/stable.json',data,'Publish verified SmartVoice '+data['versionName']+' update channel')
