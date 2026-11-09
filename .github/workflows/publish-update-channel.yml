@@ -66,26 +66,23 @@ jobs:
                   return super().redirect_request(req,fp,code,msg,headers,newurl)
           opener=urllib.request.build_opener(SafeRedirect())
           def download(asset,path,limit):
-              u=asset['browser_download_url'];assert u.startswith('https://github.com/'+REPO+'/releases/download/')
+              # Release-asset CDN occasionally answers 504; gh uses the API asset
+              # endpoint instead and is retried with backoff.
+              name=asset['name'];u=asset['browser_download_url'];assert u.startswith('https://github.com/'+REPO+'/releases/download/')
+              tag=u.split('/releases/download/')[1].split('/')[0]
               last=None
               for attempt in range(4):
                   try:
-                      path.unlink(missing_ok=True)
-                      digest=hashlib.sha256();total=0
-                      with opener.open(urllib.request.Request(u,headers={'User-Agent':'SmartVoice-channel-publisher','Cache-Control':'no-cache'}),timeout=180) as r,path.open('wb') as out:
-                          assert r.status==200
-                          while True:
-                              chunk=r.read(1024*1024)
-                              if not chunk:break
-                              total+=len(chunk);assert total<=limit;out.write(chunk);digest.update(chunk)
-                      assert total==asset['size'] and asset['digest']=='sha256:'+digest.hexdigest()
-                      return
-                  except urllib.error.HTTPError as e:
-                      if not (e.code==429 or 500<=e.code<600):raise
-                      last=e
-                  except (urllib.error.URLError,TimeoutError) as e:
-                      last=e
-                  if attempt<3:time.sleep(5*(3**attempt))
+                      with tempfile.TemporaryDirectory() as td:
+                          r=subprocess.run(['gh','release','download',tag,'--repo',REPO,'--pattern',name,'--dir',td,'--clobber'],capture_output=True,text=True)
+                          if r.returncode:raise RuntimeError((r.stderr or r.stdout).strip()[:400])
+                          data=(Path(td)/name).read_bytes()
+                      if len(data)!=asset['size'] or 'sha256:'+hashlib.sha256(data).hexdigest()!=asset['digest']:raise RuntimeError('asset size/digest mismatch')
+                      if len(data)>limit:raise RuntimeError('asset exceeds limit')
+                      path.write_bytes(data);return
+                  except Exception as e:
+                      last=e;print('download attempt',attempt+1,'failed:',e)
+                      if attempt<3:time.sleep(5*(3**attempt))
               raise last
 
           release=api('/releases/latest')
