@@ -1,6 +1,7 @@
 name: Prepare Firebase Android resources
 on:
   push:
+    branches: [main]
     paths: ['.github/workflows/prepare-firebase-resources.yml']
   workflow_dispatch:
 permissions:
@@ -11,6 +12,9 @@ jobs:
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
       - name: Link SDK resources with an isolated resource package ID
         run: |
           python3 - <<'PY'
@@ -58,5 +62,12 @@ jobs:
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add build-support/firebase-resources
+          if git diff --cached --quiet; then echo 'No Firebase changes'; exit 0; fi
           git commit -m 'Prepare isolated Firebase resource package for offline build'
-          git push
+          for attempt in 1 2 3; do
+            git fetch origin main
+            git rebase origin/main || { git rebase --abort || true; sleep 5; continue; }
+            git push origin HEAD:main && exit 0
+            sleep 5
+          done
+          echo 'Could not publish Firebase inputs to main'; exit 1

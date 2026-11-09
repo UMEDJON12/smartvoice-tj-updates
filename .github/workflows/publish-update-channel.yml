@@ -12,6 +12,11 @@ on:
         type: boolean
         required: true
         default: false
+      send_real_notification:
+        description: 'Send one REAL announcement for the latest verified release'
+        type: boolean
+        required: false
+        default: false
 permissions:
   contents: write
   id-token: write
@@ -36,10 +41,23 @@ jobs:
           CERT='5d1d676dfddad74da47b5486b4dbe9bf66b68e67c7c256d144ec0bdf3f0ed95b'
           assert os.environ['GITHUB_REPOSITORY']==REPO
           API='https://api.github.com/repos/'+REPO
-          def api(path,method='GET',data=None):
-              request=urllib.request.Request(API+path,method=method,data=json.dumps(data).encode() if data is not None else None,headers={'Authorization':'Bearer '+os.environ['GH_TOKEN'],'Accept':'application/vnd.github+json','Content-Type':'application/json','Cache-Control':'no-cache'})
-              with urllib.request.urlopen(request,timeout=60) as r:
-                  body=r.read();return json.loads(body) if body else None
+          def api(path,method='GET',data=None,attempts=4):
+              last=None
+              for attempt in range(attempts):
+                  try:
+                      request=urllib.request.Request(API+path,method=method,data=json.dumps(data).encode() if data is not None else None,headers={'Authorization':'Bearer '+os.environ['GH_TOKEN'],'Accept':'application/vnd.github+json','Content-Type':'application/json','Cache-Control':'no-cache'})
+                      with urllib.request.urlopen(request,timeout=60) as r:
+                          body=r.read();return json.loads(body) if body else None
+                  except urllib.error.HTTPError as e:
+                      last=e
+                      if e.code==429 or 500<=e.code<600:
+                          time.sleep(5*(3**attempt));continue
+                      raise
+                  except (urllib.error.URLError,TimeoutError) as e:
+                      last=e
+                      if attempt==attempts-1:break
+                      time.sleep(5*(3**attempt))
+              raise last
           class SafeRedirect(urllib.request.HTTPRedirectHandler):
               def redirect_request(self,req,fp,code,msg,headers,newurl):
                   u=urllib.parse.urlsplit(newurl)
@@ -49,14 +67,27 @@ jobs:
           opener=urllib.request.build_opener(SafeRedirect())
           def download(asset,path,limit):
               u=asset['browser_download_url'];assert u.startswith('https://github.com/'+REPO+'/releases/download/')
-              digest=hashlib.sha256();total=0
-              with opener.open(urllib.request.Request(u,headers={'User-Agent':'SmartVoice-channel-publisher','Cache-Control':'no-cache'}),timeout=90) as r,path.open('wb') as out:
-                  assert r.status==200
-                  while True:
-                      chunk=r.read(1024*1024)
-                      if not chunk:break
-                      total+=len(chunk);assert total<=limit;out.write(chunk);digest.update(chunk)
-              assert total==asset['size'] and asset['digest']=='sha256:'+digest.hexdigest()
+              last=None
+              for attempt in range(4):
+                  try:
+                      path.unlink(missing_ok=True)
+                      digest=hashlib.sha256();total=0
+                      with opener.open(urllib.request.Request(u,headers={'User-Agent':'SmartVoice-channel-publisher','Cache-Control':'no-cache'}),timeout=180) as r,path.open('wb') as out:
+                          assert r.status==200
+                          while True:
+                              chunk=r.read(1024*1024)
+                              if not chunk:break
+                              total+=len(chunk);assert total<=limit;out.write(chunk);digest.update(chunk)
+                      assert total==asset['size'] and asset['digest']=='sha256:'+digest.hexdigest()
+                      return
+                  except urllib.error.HTTPError as e:
+                      if not (e.code==429 or 500<=e.code<600):raise
+                      last=e
+                  except (urllib.error.URLError,TimeoutError) as e:
+                      last=e
+                  if attempt<3:time.sleep(5*(3**attempt))
+              raise last
+
           release=api('/releases/latest')
           if os.environ.get('GITHUB_EVENT_NAME')=='release':
               event=json.loads(Path(os.environ['GITHUB_EVENT_PATH']).read_text())
@@ -90,12 +121,32 @@ jobs:
               assert int(re.search(r"sdkVersion:'([0-9]+)'",badging).group(1))==data['minSdk']
           assert api('/releases/latest')['id']==release['id'],'Latest changed during verification; keep previous channel'
           data.update(ready=True,tagName=release['tag_name'],publishedAt=release['published_at'])
-          path='/contents/updates/stable.json';body={'message':'Publish verified SmartVoice '+data['versionName']+' update channel','branch':'main','content':base64.b64encode((json.dumps(data,ensure_ascii=False,indent=2)+'\n').encode()).decode()}
-          try:body['sha']=api(path+'?ref=main')['sha']
+          def put_content(path,obj,message,attempts=5):
+              encoded=base64.b64encode((json.dumps(obj,ensure_ascii=False,indent=2)+'\n').encode()).decode()
+              last=None
+              for attempt in range(attempts):
+                  body={'message':message,'branch':'main','content':encoded}
+                  try:
+                      try:body['sha']=api(path+'?ref=main')['sha']
+                      except urllib.error.HTTPError as e:
+                          if e.code!=404:raise
+                      return api(path,'PUT',body)
+                  except urllib.error.HTTPError as e:
+                      last=e
+                      if not (e.code in (409,422) or e.code==429 or 500<=e.code<600):raise
+                  except (urllib.error.URLError,TimeoutError) as e:
+                      last=e
+                  time.sleep(3*(attempt+1))
+              raise last
+          current=None
+          try:current=json.loads(base64.b64decode(api('/contents/updates/stable.json?ref=main')['content']))
           except urllib.error.HTTPError as e:
               if e.code!=404:raise
-          api(path,'PUT',body)
-          print(json.dumps({'ready':True,'versionName':data['versionName'],'versionCode':data['versionCode'],'releaseId':release['id'],'publicApkDownloadedAndVerified':True}))
+          if current and current.get('versionCode')==data['versionCode'] and current.get('sha256')==data['sha256']:
+              print(json.dumps({'channelAlreadyCurrent':True,'versionName':data['versionName'],'versionCode':data['versionCode']}))
+          else:
+              put_content('/contents/updates/stable.json',data,'Publish verified SmartVoice '+data['versionName']+' update channel')
+              print(json.dumps({'ready':True,'versionName':data['versionName'],'versionCode':data['versionCode'],'releaseId':release['id'],'publicApkDownloadedAndVerified':True}))
           PY
 
       - name: Authenticate only the release workflow for FCM
@@ -114,17 +165,34 @@ jobs:
         if: github.event_name == 'release' || (github.event_name == 'workflow_dispatch' && inputs.test_notification != true)
         env:
           FCM_ACCESS_TOKEN: ${{ steps.fcm_auth.outputs.access_token }}
-          VALIDATE_ONLY: ${{ github.event_name != 'release' }}
+          VALIDATE_ONLY: ${{ github.event_name != 'release' && (github.event_name != 'workflow_dispatch' || inputs.send_real_notification != true) }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           python3 - <<'PY'
-          import base64,json,os,urllib.request
+          import base64,json,os,time,urllib.error,urllib.request
           from pathlib import Path
           API='https://api.github.com/repos/UMEDJON12/smartvoice-tj-updates'
           def api(path,method='GET',data=None):
               req=urllib.request.Request(API+path,method=method,data=json.dumps(data).encode() if data is not None else None,headers={'Authorization':'Bearer '+os.environ['GH_TOKEN'],'Accept':'application/vnd.github+json','Content-Type':'application/json'})
               with urllib.request.urlopen(req,timeout=30) as r:
                   body=r.read();return json.loads(body) if body else None
+          def put_content(path,obj,message,attempts=5):
+              encoded=base64.b64encode((json.dumps(obj,ensure_ascii=False,indent=2)+'\n').encode()).decode()
+              last=None
+              for attempt in range(attempts):
+                  body={'message':message,'branch':'main','content':encoded}
+                  try:
+                      try:body['sha']=api(path+'?ref=main')['sha']
+                      except urllib.error.HTTPError as e:
+                          if e.code!=404:raise
+                      return api(path,'PUT',body)
+                  except urllib.error.HTTPError as e:
+                      last=e
+                      if not (e.code in (409,422) or e.code==429 or 500<=e.code<600):raise
+                  except (urllib.error.URLError,TimeoutError) as e:
+                      last=e
+                  time.sleep(3*(attempt+1))
+              raise last
           channel=api('/contents/updates/stable.json?ref=main')
           data=json.loads(base64.b64decode(channel['content']))
           assert data['ready'] is True and data['testOnly'] is False and data['variant']=='standard' and data['packageName']=='tts.smartvoice.umedjon'
@@ -133,15 +201,24 @@ jobs:
           if os.environ.get('GITHUB_EVENT_NAME')=='release':
               event=json.loads(Path(os.environ['GITHUB_EVENT_PATH']).read_text());assert event['release']['id']==release['id']
           validate=os.environ['VALIDATE_ONLY']=='true'
+          if not validate:
+              assert os.environ.get('GITHUB_REF')=='refs/heads/main','Real announcement is allowed only from main'
+              delivery=None
+              try:delivery=json.loads(base64.b64decode(api('/contents/checks/push-delivery.json?ref=main')['content']))
+              except urllib.error.HTTPError as e:
+                  if e.code!=404:raise
+              if delivery and delivery.get('versionCode')==data['versionCode'] and delivery.get('state')=='accepted' and delivery.get('acceptedByFcm'):
+                  print(json.dumps({'alreadyAnnounced':True,'versionCode':data['versionCode'],'previousRunId':delivery.get('runId')}))
+                  raise SystemExit(0)
+              if delivery and delivery.get('versionCode')==data['versionCode'] and delivery.get('state')=='intent' and delivery.get('runId')!=os.environ['GITHUB_RUN_ID']:
+                  raise SystemExit('Предыдущая попытка отправки не подтверждена; повторная массовая рассылка запрещена')
+              put_content('/contents/checks/push-delivery.json',{'state':'intent','versionName':data['versionName'],'versionCode':data['versionCode'],'validateOnly':False,'runId':os.environ['GITHUB_RUN_ID'],'startedAt':int(time.time())},'Record FCM announcement intent')
           payload={'validate_only':validate,'message':{'topic':'smartvoice-standard','android':{'priority':'HIGH','ttl':'604800s','collapse_key':'smartvoice-release'},'data':{'schema':'1','kind':'smartvoice-update','packageName':data['packageName'],'variant':data['variant'],'versionCode':str(data['versionCode']),'versionName':data['versionName'],'minSdk':str(data['minSdk'])}}}
           req=urllib.request.Request('https://fcm.googleapis.com/v1/projects/smartvoice-updates/messages:send',method='POST',data=json.dumps(payload).encode(),headers={'Authorization':'Bearer '+os.environ['FCM_ACCESS_TOKEN'],'Content-Type':'application/json'})
           with urllib.request.urlopen(req,timeout=30) as r:result=json.load(r)
-          report={'versionName':data['versionName'],'versionCode':data['versionCode'],'validateOnly':validate,'acceptedByFcm':True,'deviceDeliveryConfirmed':False,'messageName':result.get('name',''),'runId':os.environ['GITHUB_RUN_ID']}
-          path='/contents/checks/push-delivery.json';body={'message':'Record FCM announcement validation' if validate else 'Record accepted SmartVoice update announcement','branch':'main','content':base64.b64encode((json.dumps(report,indent=2)+'\n').encode()).decode()}
-          try:body['sha']=api(path+'?ref=main')['sha']
-          except urllib.error.HTTPError as e:
-              if e.code!=404:raise
-          api(path,'PUT',body);print(json.dumps(report))
+          report={'state':'validated' if validate else 'accepted','versionName':data['versionName'],'versionCode':data['versionCode'],'validateOnly':validate,'acceptedByFcm':True,'deviceDeliveryConfirmed':False,'messageName':result.get('name',''),'runId':os.environ['GITHUB_RUN_ID']}
+          put_content('/contents/checks/push-validation.json' if validate else '/contents/checks/push-delivery.json',report,'Record FCM announcement validation' if validate else 'Record accepted SmartVoice update announcement')
+          print(json.dumps(report))
           PY
 
 
