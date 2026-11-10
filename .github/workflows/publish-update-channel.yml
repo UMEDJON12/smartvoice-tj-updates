@@ -199,7 +199,7 @@ jobs:
               event=json.loads(Path(os.environ['GITHUB_EVENT_PATH']).read_text());assert event['release']['id']==release['id']
           validate=os.environ['VALIDATE_ONLY']=='true'
           if not validate:
-              assert os.environ.get('GITHUB_REF')=='refs/heads/main','Real announcement is allowed only from main'
+              assert os.environ.get('GITHUB_REF')=='refs/heads/main' or os.environ.get('GITHUB_EVENT_NAME')=='release','Real announcement is allowed only from main or a published release'
               delivery=None
               try:delivery=json.loads(base64.b64decode(api('/contents/checks/push-delivery.json?ref=main')['content']))
               except urllib.error.HTTPError as e:
