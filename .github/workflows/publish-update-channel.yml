@@ -5,6 +5,8 @@ on:
   push:
     branches: [main]
     paths: ['.github/workflows/publish-update-channel.yml']
+  repository_dispatch:
+    types: [announce-release]
   workflow_dispatch:
     inputs:
       test_notification:
@@ -159,10 +161,10 @@ jobs:
           create_credentials_file: false
           export_environment_variables: false
       - name: Send an announcement after verified publication
-        if: github.event_name == 'release' || (github.event_name == 'workflow_dispatch' && inputs.test_notification != true)
+        if: github.event_name == 'release' || github.event_name == 'repository_dispatch' || (github.event_name == 'workflow_dispatch' && inputs.test_notification != true)
         env:
           FCM_ACCESS_TOKEN: ${{ steps.fcm_auth.outputs.access_token }}
-          VALIDATE_ONLY: ${{ github.event_name != 'release' && (github.event_name != 'workflow_dispatch' || inputs.send_real_notification != true) }}
+          VALIDATE_ONLY: ${{ github.event_name != 'release' && github.event_name != 'repository_dispatch' && (github.event_name != 'workflow_dispatch' || inputs.send_real_notification != true) }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           python3 - <<'PY'
