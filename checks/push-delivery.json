@@ -1,9 +1,8 @@
 {
-  "state": "failed",
+  "state": "intent",
   "versionName": "5.2.61-TJ",
   "versionCode": 4200,
   "validateOnly": false,
-  "runId": "42798161995",
-  "startedAt": 1794305975,
-  "note": "previous announcement attempt failed on missing FCM auth; retry allowed"
+  "runId": "42799589567",
+  "startedAt": 1794306588
 }
