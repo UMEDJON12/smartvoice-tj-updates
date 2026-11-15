@@ -1,0 +1,159 @@
+name: SmartVoice Android emulator pilot
+on:
+  push:
+    branches: [smartvoice-android-emulator-pilot]
+    paths: [.github/workflows/android-emulator-pilot.yml]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  android:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 28
+    env:
+      IMAGE: system-images;android-36;google_apis;x86_64
+      APK_URL: https://github.com/UMEDJON12/smartvoice-tj-updates/releases/download/v5.2.70-TJ/SmartVoice-5.2.70-TJ.apk
+      APK_SHA256: 0c054a9c85394a401e2790938c1eaf355871fd9676988d6efb3a9cb968555c51
+      PKG: tts.smartvoice.umedjon
+    steps:
+      - name: Prepare Android 16 and the released APK
+        run: |
+          mkdir -p results
+          test -c /dev/kvm
+          sudo chmod a+rw /dev/kvm
+          sdkmanager --install 'emulator' 'platform-tools' 'platforms;android-36' 'build-tools;36.0.0' "$IMAGE"
+          printf 'no\n' | avdmanager create avd --force --name smartvoice-pilot --package "$IMAGE"
+          curl --fail --location --silent --show-error --retry 2 --max-time 180 "$APK_URL" -o SmartVoice.apk
+          printf '%s  SmartVoice.apk\n' "$APK_SHA256" | sha256sum --check | tee results/apk-sha256.txt
+          "$ANDROID_HOME/build-tools/36.0.0/apksigner" verify --print-certs SmartVoice.apk > results/apk-signature.txt
+
+      - name: Boot Android, install APK and open screens
+        run: |
+          emulator_bin="$ANDROID_HOME/emulator/emulator"
+          "$emulator_bin" -accel-check | tee results/acceleration.txt
+          nohup "$emulator_bin" -avd smartvoice-pilot -no-window -no-audio -no-boot-anim -no-snapshot -gpu swiftshader_indirect -accel on > results/emulator.log 2>&1 < /dev/null &
+          timeout 420 bash -c 'adb wait-for-device; until [[ $(adb shell getprop sys.boot_completed 2>/dev/null | tr -d "\r") == 1 ]]; do sleep 3; done'
+          adb shell getprop > results/android-properties.txt
+          adb shell getprop ro.product.cpu.abilist | tee results/android-abis.txt
+          adb shell input keyevent 82
+          adb install SmartVoice.apk | tee results/install.txt
+          adb logcat -c
+          for screen in UmedjonPreferenceActivity UmedjonQuickControlActivity; do
+            adb shell am start -W -n "$PKG/tts.smartvoice.ui.$screen" | tee "results/$screen-start.txt"
+            grep -q 'Status: ok' "results/$screen-start.txt"
+            adb shell dumpsys activity activities > "results/$screen-activities.txt"
+            grep -E 'mResumedActivity|topResumedActivity' "results/$screen-activities.txt" | grep -F "$PKG/tts.smartvoice.ui.$screen"
+            adb exec-out screencap -p > "results/$screen.png"
+          done
+
+      - name: Check initialization through Android TextToSpeech API
+        run: |
+          adb shell settings put secure tts_default_synth "$PKG"
+          build="$ANDROID_HOME/build-tools/36.0.0"
+          platform="$ANDROID_HOME/platforms/android-36/android.jar"
+          mkdir -p probe/classes probe/dex
+          cat > probe/AndroidManifest.xml <<'XML'
+          <manifest xmlns:android="http://schemas.android.com/apk/res/android" package="org.smartvoice.ciprobe">
+            <queries><intent><action android:name="android.intent.action.TTS_SERVICE" /></intent></queries>
+            <application android:label="SmartVoice CI probe" />
+            <instrumentation android:name=".TtsProbe" android:targetPackage="org.smartvoice.ciprobe" />
+          </manifest>
+          XML
+          cat > probe/TtsProbe.java <<'JAVA'
+          package org.smartvoice.ciprobe;
+          import android.app.Activity;
+          import android.app.Instrumentation;
+          import android.content.ComponentName;
+          import android.content.Context;
+          import android.content.Intent;
+          import android.content.ServiceConnection;
+          import android.os.Bundle;
+          import android.os.IBinder;
+          import android.speech.tts.TextToSpeech;
+          import java.util.concurrent.CountDownLatch;
+          import java.util.concurrent.TimeUnit;
+          import java.util.concurrent.atomic.AtomicInteger;
+
+          public final class TtsProbe extends Instrumentation {
+            @Override public void onCreate(Bundle args) {
+              super.onCreate(args);
+              start();
+            }
+
+            @Override public void onStart() {
+              String expected = "tts.smartvoice.umedjon";
+              CountDownLatch loaded = new CountDownLatch(1);
+              CountDownLatch connected = new CountDownLatch(1);
+              ServiceConnection service = new ServiceConnection() {
+                @Override public void onServiceConnected(ComponentName name, IBinder binder) {
+                  if (expected.equals(name.getPackageName()) && binder.isBinderAlive()) connected.countDown();
+                }
+                @Override public void onServiceDisconnected(ComponentName name) {}
+              };
+              AtomicInteger status = new AtomicInteger(TextToSpeech.ERROR);
+              Bundle report = new Bundle();
+              TextToSpeech tts = null;
+              Context context = getTargetContext();
+              boolean bound = false;
+              int result = Activity.RESULT_CANCELED;
+              try {
+                Intent intent = new Intent("android.intent.action.TTS_SERVICE");
+                intent.setComponent(new ComponentName(expected, "tts.smartvoice.UmedjonTtsService"));
+                bound = context.bindService(intent, service, Context.BIND_AUTO_CREATE);
+                if (!bound || !connected.await(30, TimeUnit.SECONDS)) {
+                  throw new IllegalStateException("Could not bind the SmartVoice TTS service");
+                }
+                tts = new TextToSpeech(context, code -> {
+                  status.set(code);
+                  loaded.countDown();
+                }, expected);
+                if (!loaded.await(45, TimeUnit.SECONDS)) {
+                  throw new IllegalStateException("TTS initialization timed out");
+                }
+                String engine = tts.getDefaultEngine();
+                if (status.get() != TextToSpeech.SUCCESS || !expected.equals(engine)) {
+                  throw new IllegalStateException("TTS result=" + status.get() + ", engine=" + engine);
+                }
+                report.putString("smartvoice_tts", "PASS");
+                result = Activity.RESULT_OK;
+              } catch (Exception error) {
+                report.putString("smartvoice_tts", "FAIL: " + error);
+              } finally {
+                if (tts != null) tts.shutdown();
+                if (bound) context.unbindService(service);
+                finish(result, report);
+              }
+            }
+          }
+          JAVA
+          javac --release 8 -cp "$platform" -d probe/classes probe/TtsProbe.java
+          "$build/d8" --min-api 23 --lib "$platform" --output probe/dex probe/classes/org/smartvoice/ciprobe/*.class
+          "$build/aapt2" link -I "$platform" --min-sdk-version 23 --target-sdk-version 36 --manifest probe/AndroidManifest.xml -o probe/base.apk
+          zip -q -j probe/base.apk probe/dex/classes.dex
+          "$build/zipalign" -f 4 probe/base.apk probe/aligned.apk
+          keytool -genkeypair -noprompt -keystore probe/test.jks -storepass android -keypass android -alias probe -keyalg RSA -keysize 2048 -validity 2 -dname 'CN=Ephemeral CI probe'
+          "$build/apksigner" sign --ks probe/test.jks --ks-pass pass:android --out probe/signed.apk probe/aligned.apk
+          adb install probe/signed.apk
+          timeout 110 adb shell am instrument -w org.smartvoice.ciprobe/.TtsProbe | tr -d '\r' | tee results/tts-initialization.txt
+          grep -Fx 'INSTRUMENTATION_RESULT: smartvoice_tts=PASS' results/tts-initialization.txt
+
+      - name: Capture Android log and check for application crashes
+        if: always()
+        run: |
+          mkdir -p results
+          if adb get-state >/dev/null 2>&1; then
+            adb logcat -d -v threadtime > results/logcat.txt
+            if grep -E 'Process: tts\.smartvoice\.umedjon([:, ]|$)|ANR in tts\.smartvoice\.umedjon([: ]|$)' results/logcat.txt; then
+              exit 1
+            fi
+          fi
+
+      - name: Save emulator reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: smartvoice-android-pilot
+          path: results/
+          retention-days: 7
