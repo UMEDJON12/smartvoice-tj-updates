@@ -12,6 +12,9 @@ jobs:
   android:
     runs-on: ubuntu-24.04
     timeout-minutes: 28
+    defaults:
+      run:
+        shell: bash
     env:
       IMAGE: system-images;android-36;google_apis;x86_64
       APK_URL: https://github.com/UMEDJON12/smartvoice-tj-updates/releases/download/v5.2.70-TJ/SmartVoice-5.2.70-TJ.apk
@@ -23,8 +26,18 @@ jobs:
           mkdir -p results
           test -c /dev/kvm
           sudo chmod a+rw /dev/kvm
-          sdkmanager --install 'emulator' 'platform-tools' 'platforms;android-36' 'build-tools;36.0.0' "$IMAGE"
-          printf 'no\n' | avdmanager create avd --force --name smartvoice-pilot --package "$IMAGE"
+          export ANDROID_HOME="$RUNNER_TEMP/android-sdk"
+          export ANDROID_SDK_ROOT="$ANDROID_HOME"
+          tools_path="$ANDROID_HOME/cmdline-tools/latest"
+          mkdir -p "$tools_path"
+          curl -fsSL --retry 2 --max-time 150 https://dl.google.com/android/repository/commandlinetools-linux-15641748_latest.zip -o "$RUNNER_TEMP/android-tools.zip"
+          unzip -q "$RUNNER_TEMP/android-tools.zip" -d "$RUNNER_TEMP/android-tools"
+          cp -a "$RUNNER_TEMP/android-tools/cmdline-tools/." "$tools_path/"
+          printf 'ANDROID_HOME=%s\nANDROID_SDK_ROOT=%s\n' "$ANDROID_HOME" "$ANDROID_HOME" >> "$GITHUB_ENV"
+          printf '%s\n' "$ANDROID_HOME/platform-tools" >> "$GITHUB_PATH"
+          (yes || true) | "$tools_path/bin/sdkmanager" --sdk_root="$ANDROID_HOME" --licenses > results/sdk-licenses.txt
+          "$tools_path/bin/sdkmanager" --sdk_root="$ANDROID_HOME" --install 'emulator' 'platform-tools' 'platforms;android-36' 'build-tools;36.0.0' "$IMAGE" | tee results/sdk-install.txt
+          "$tools_path/bin/avdmanager" create avd --force --name smartvoice-pilot --package "$IMAGE" <<< no
           curl --fail --location --silent --show-error --retry 2 --max-time 180 "$APK_URL" -o SmartVoice.apk
           printf '%s  SmartVoice.apk\n' "$APK_SHA256" | sha256sum --check | tee results/apk-sha256.txt
           "$ANDROID_HOME/build-tools/36.0.0/apksigner" verify --print-certs SmartVoice.apk > results/apk-signature.txt
