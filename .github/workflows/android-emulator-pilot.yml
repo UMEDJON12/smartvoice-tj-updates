@@ -67,11 +67,27 @@ jobs:
           adb shell input keyevent 82
           adb install SmartVoice.apk | tee results/install.txt
           adb logcat -c
+          resumed() {
+            adb shell dumpsys activity activities | grep -E 'mResumedActivity|topResumedActivity' || true
+          }
+          wait_for_screen() {
+            local screen="$1"
+            for attempt in {1..12}; do
+              if [[ $(resumed) == *"$PKG/tts.smartvoice.ui.$screen"* ]]; then return 0; fi
+              sleep 1
+            done
+            resumed
+            return 1
+          }
           for screen in UmedjonPreferenceActivity UmedjonQuickControlActivity; do
             adb shell am start -W -n "$PKG/tts.smartvoice.ui.$screen" | tee "results/$screen-start.txt"
             grep -q 'Status: ok' "results/$screen-start.txt"
+            if [[ "$screen" == UmedjonPreferenceActivity ]] && [[ $(resumed) == *"$PKG/tts.smartvoice.ui.SetupActivity"* ]]; then
+              adb exec-out screencap -p > results/SetupActivity.png
+              adb shell input keyevent KEYCODE_BACK
+            fi
+            wait_for_screen "$screen" | tee "results/$screen-resumed.txt"
             adb shell dumpsys activity activities > "results/$screen-activities.txt"
-            grep -E 'mResumedActivity|topResumedActivity' "results/$screen-activities.txt" | grep -F "$PKG/tts.smartvoice.ui.$screen"
             adb exec-out screencap -p > "results/$screen.png"
           done
 
