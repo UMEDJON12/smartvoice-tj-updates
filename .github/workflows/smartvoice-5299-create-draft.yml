@@ -1,0 +1,112 @@
+name: Create verified SmartVoice.TJ 5.2.99 draft only
+
+on:
+  push:
+    branches:
+      - 'release-prep/v5.2.99-TJ'
+    paths:
+      - 'release-candidates/v5.2.99-TJ/START-DRAFT.txt'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: sv-5299-create-draft
+  cancel-in-progress: false
+
+jobs:
+  create-draft:
+    if: github.repository == 'UMEDJON12/smartvoice-tj-updates' && github.ref == 'refs/heads/release-prep/v5.2.99-TJ'
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      TAG: v5.2.99-TJ
+      ROOT: release-candidates/v5.2.99-TJ
+      APK: SmartVoice-5.2.99-TJ.apk
+      REPO: UMEDJON12/smartvoice-tj-updates
+    steps:
+      - name: Check out exact, immutable release preparation
+        uses: actions/checkout@v4
+
+      - name: Assemble byte-identical already-signed APK from verified base
+        shell: bash
+        run: |
+          set -euo pipefail
+          if ! command -v zstd >/dev/null 2>&1; then
+            sudo apt-get update -qq
+            sudo apt-get install -y -qq zstd
+          fi
+          mkdir -p "$RUNNER_TEMP/sv99"
+          gh release download v5.2.97-TJ --repo "$REPO" \
+            --pattern SmartVoice-5.2.97-TJ.apk --dir "$RUNNER_TEMP/sv99" --clobber
+          (
+            cd "$RUNNER_TEMP/sv99"
+            echo 'c62d241f151545987293d572874d374e8bee89e295d42fbef5d47e4fc2566e3f  SmartVoice-5.2.97-TJ.apk' | sha256sum -c -
+          )
+          cat "$ROOT"/staging/part-*.b64 | tr -d '\n\r\t ' | base64 --decode > "$RUNNER_TEMP/sv99/signed-delta.zip"
+          echo '0a87df8e5cfdf1482a1fb2dc9ea20e6fa32b26cc4704ed85d52302d57ae20bbc  '"$RUNNER_TEMP/sv99/signed-delta.zip" | sha256sum -c -
+          python3 "$ROOT/reconstruct_signed_apk.py" \
+            "$RUNNER_TEMP/sv99/SmartVoice-5.2.97-TJ.apk" \
+            "$RUNNER_TEMP/sv99/signed-delta.zip" \
+            "$RUNNER_TEMP/sv99/$APK"
+          echo '2fd6ce50926c96c8021d1ba0f1b214e674bf70287249cf2e60841756faade156  '"$RUNNER_TEMP/sv99/$APK" | sha256sum -c -
+          python3 - "$ROOT/update.json" "$RUNNER_TEMP/sv99/$APK" <<'PY'
+          import hashlib,json,sys
+          from pathlib import Path
+          m=json.loads(Path(sys.argv[1]).read_text(encoding='utf-8'))
+          b=Path(sys.argv[2]);digest=hashlib.sha256(b.read_bytes()).hexdigest()
+          assert m['schemaVersion']==1 and m['testOnly'] is False and m['variant']=='standard'
+          assert m['packageName']=='tts.smartvoice.umedjon'
+          assert m['versionName']=='5.2.99-TJ' and m['versionCode']==4238
+          assert m['apkFileName']==b.name and m['sizeBytes']==b.stat().st_size and m['sha256']==digest
+          assert m['signingCertificateSha256']=='5d1d676dfddad74da47b5486b4dbe9bf66b68e67c7c256d144ec0bdf3f0ed95b'
+          assert m['apkUrl']=='https://github.com/UMEDJON12/smartvoice-tj-updates/releases/download/v5.2.99-TJ/SmartVoice-5.2.99-TJ.apk'
+          assert set(m['releaseNotesByLanguage'])=={'ru','tg','en','es','fa','ar'}
+          assert all(len(v)>100 for v in m['releaseNotesByLanguage'].values())
+          print('Release manifest and all six localized notes verified')
+          PY
+
+      - name: Create or refresh DRAFT only and attach signed APK and metadata
+        shell: bash
+        run: |
+          set -euo pipefail
+          if gh release view "$TAG" --repo "$REPO" --json isDraft --jq .isDraft > "$RUNNER_TEMP/sv99/existing.txt" 2>/dev/null; then
+            test "$(cat "$RUNNER_TEMP/sv99/existing.txt")" = 'true' || { echo 'ERROR: Refusing to modify a published release'; exit 1; }
+            gh release upload "$TAG" --repo "$REPO" --clobber \
+              "$RUNNER_TEMP/sv99/$APK" \
+              "$ROOT/update.json"
+            gh release edit "$TAG" --repo "$REPO" --draft \
+              --title 'SmartVoice.TJ 5.2.99-TJ (4238)' \
+              --notes-file "$ROOT/RELEASE-NOTES-6-LANGUAGES.md"
+          else
+            gh release create "$TAG" --repo "$REPO" --draft --target main \
+              --title 'SmartVoice.TJ 5.2.99-TJ (4238)' \
+              --notes-file "$ROOT/RELEASE-NOTES-6-LANGUAGES.md" \
+              "$RUNNER_TEMP/sv99/$APK" \
+              "$ROOT/update.json"
+          fi
+
+      - name: Verify draft status and uploaded asset hashes WITHOUT publishing
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh api "repos/$REPO/releases/tags/$TAG" > "$RUNNER_TEMP/sv99/release.json"
+          python3 - "$RUNNER_TEMP/sv99/release.json" "$ROOT/update.json" <<'PY'
+          import json,sys
+          r=json.load(open(sys.argv[1]));m=json.load(open(sys.argv[2]))
+          assert r['draft'] is True and r['prerelease'] is False and r['published_at'] is None
+          assert r['tag_name']=='v5.2.99-TJ'
+          a={x['name']:x for x in r['assets']}
+          for key in ('SmartVoice-5.2.99-TJ.apk','update.json'):
+              assert key in a and a[key]['state']=='uploaded',f'Missing asset: {key}'
+          x=a['SmartVoice-5.2.99-TJ.apk']
+          assert x['size']==m['sizeBytes'] and x['digest']=='sha256:'+m['sha256']
+          assert r['html_url'].startswith('https://github.com/UMEDJON12/smartvoice-tj-updates/releases/')
+          print('READY DRAFT (NOT PUBLISHED):',r['html_url'])
+          print('APK:',x['name'],'size',x['size'],'digest',x['digest'])
+          print('Metadata: update.json; six languages:',','.join(m['releaseNotesByLanguage']))
+          PY
+          gh release view "$TAG" --repo "$REPO" --json url,isDraft,assets --jq '{url: .url, isDraft: .isDraft, assets: [.assets[].name]}'
+          echo "DRAFT: https://github.com/$REPO/releases/tag/$TAG" >> "$GITHUB_STEP_SUMMARY"
+          echo 'APK and update.json uploaded. Signed APK SHA256 verified; release remains a DRAFT. Publishing is exclusively the owner action.' >> "$GITHUB_STEP_SUMMARY"
