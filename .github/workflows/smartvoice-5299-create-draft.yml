@@ -71,14 +71,10 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          if gh release view "$TAG" --repo "$REPO" --json isDraft --jq .isDraft > "$RUNNER_TEMP/sv99/existing.txt" 2>/dev/null; then
-            test "$(cat "$RUNNER_TEMP/sv99/existing.txt")" = 'true' || { echo 'ERROR: Refusing to modify a published release'; exit 1; }
-            gh release upload "$TAG" --repo "$REPO" --clobber \
-              "$RUNNER_TEMP/sv99/$APK" \
-              "$ROOT/update.json"
-            gh release edit "$TAG" --repo "$REPO" --draft \
-              --title 'SmartVoice.TJ 5.2.99-TJ (4238)' \
-              --notes-file "$ROOT/RELEASE-NOTES-6-LANGUAGES.md"
+          existing_id="$(gh api "repos/$REPO/releases?per_page=100" --jq '.[] | select(.tag_name == "v5.2.99-TJ") | .id' | head -1)"
+          if [[ -n "$existing_id" ]]; then
+            test "$(gh api "repos/$REPO/releases/$existing_id" --jq .draft)" = 'true' || { echo 'ERROR: Existing release is published; refusing modification'; exit 1; }
+            echo "Release $existing_id is already a DRAFT; retaining the existing verified assets"
           else
             gh release create "$TAG" --repo "$REPO" --draft --target main \
               --title 'SmartVoice.TJ 5.2.99-TJ (4238)' \
@@ -91,7 +87,9 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          gh api "repos/$REPO/releases/tags/$TAG" > "$RUNNER_TEMP/sv99/release.json"
+          release_id="$(gh api "repos/$REPO/releases?per_page=100" --jq '.[] | select(.tag_name == "v5.2.99-TJ") | .id' | head -1)"
+          test -n "$release_id" || { echo 'ERROR: Draft release not found'; exit 1; }
+          gh api "repos/$REPO/releases/$release_id" > "$RUNNER_TEMP/sv99/release.json"
           python3 - "$RUNNER_TEMP/sv99/release.json" "$ROOT/update.json" <<'PY'
           import json,sys
           r=json.load(open(sys.argv[1]));m=json.load(open(sys.argv[2]))
@@ -107,6 +105,5 @@ jobs:
           print('APK:',x['name'],'size',x['size'],'digest',x['digest'])
           print('Metadata: update.json; six languages:',','.join(m['releaseNotesByLanguage']))
           PY
-          gh release view "$TAG" --repo "$REPO" --json url,isDraft,assets --jq '{url: .url, isDraft: .isDraft, assets: [.assets[].name]}'
           echo "DRAFT: https://github.com/$REPO/releases/tag/$TAG" >> "$GITHUB_STEP_SUMMARY"
           echo 'APK and update.json uploaded. Signed APK SHA256 verified; release remains a DRAFT. Publishing is exclusively the owner action.' >> "$GITHUB_STEP_SUMMARY"
