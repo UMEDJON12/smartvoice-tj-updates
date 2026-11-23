@@ -1,0 +1,7 @@
+SmartVoice.TJ 5.2.99-TJ (4238)
+Requested: create GitHub Draft Release v5.2.99-TJ with APK and update.json.
+Publish: forbidden; owner presses Publish manually.
+Expected signed APK SHA256: 2fd6ce50926c96c8021d1ba0f1b214e674bf70287249cf2e60841756faade156
+Expected signed APK size: 101608160 bytes.
+Localizations: ru, tg, en, es, fa, ar.
+Source: public v5.2.97-TJ signed APK + verified, keyless, byte-identical delta.
