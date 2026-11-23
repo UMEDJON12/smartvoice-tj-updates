@@ -5,3 +5,5 @@ Expected signed APK SHA256: 2fd6ce50926c96c8021d1ba0f1b214e674bf70287249cf2e6084
 Expected signed APK size: 101608160 bytes.
 Localizations: ru, tg, en, es, fa, ar.
 Source: public v5.2.97-TJ signed APK + verified, keyless, byte-identical delta.
+
+Verification rerun: preserve existing Draft Release and attached APK; validate through release ID.
