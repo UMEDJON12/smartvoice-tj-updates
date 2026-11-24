@@ -1,8 +1,10 @@
 {
-  "state": "intent",
+  "state": "accepted",
   "versionName": "5.2.100-TJ",
   "versionCode": 4239,
   "validateOnly": false,
-  "runId": "45386645257",
-  "startedAt": 1795520570
+  "acceptedByFcm": true,
+  "deviceDeliveryConfirmed": false,
+  "messageName": "projects/smartvoice-updates/messages/218287755431681779",
+  "runId": "45386645257"
 }
